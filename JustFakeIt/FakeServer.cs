@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Owin;
 using Microsoft.Owin.Hosting;
 using Owin;
 
@@ -29,14 +30,32 @@ namespace JustFakeIt
             {
                 foreach (var expectation in _expectations)
                 {
-                    app.Map(expectation.Request.Url, builder => builder.Run(context =>
-                    {
-                        context.Response.Headers.Add("Content-Type", new[] { "application/json" });
-                        context.Response.StatusCode = expectation.Response.StatusCode;
-                        return context.Response.WriteAsync(expectation.Response.ExpectedResult);
-                    }));
+                    app.MapWhen(
+                        context => RequestAndExpectedHttpMethodAndPathsMatch(context, expectation),
+                        builder => builder.Run(context =>
+                        {
+                            context.Response.Headers.Add("Content-Type", new[] {"application/json"});
+                            context.Response.StatusCode = expectation.Response.StatusCode;
+                            return context.Response.WriteAsync(expectation.Response.ExpectedResult);
+                        }));
                 }
             });
+        }
+
+        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpExpectation expectation)
+        {
+            return RequestAndExpectedHttpMethodsMatch(context, expectation) &&
+                   RequestAndExpectedPathsMatch(context, expectation);
+        }
+
+        private static bool RequestAndExpectedPathsMatch(IOwinContext context, HttpExpectation expectation)
+        {
+            return context.Request.Path.Equals(new PathString(expectation.Request.Url));
+        }
+
+        private static bool RequestAndExpectedHttpMethodsMatch(IOwinContext context, HttpExpectation expectation)
+        {
+            return context.Request.Method.Equals(expectation.Request.Method.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
         public HttpExpectation Expect(Http method, string url)
