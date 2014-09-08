@@ -1,4 +1,41 @@
 JustFakeIt
 ==========
+_An InProcess HTTP server which can be mocked and asserted against to allow for full stack HTTP testing_
 
-Fake HTTP server for faster end-to-end tests
+---
+
+* Introduction
+* Installation
+* Getting Started
+* Contributing
+* Copyright
+
+JustFaxkeIt is a mockable HTTP server which is hosted within your unit test process and provides you with the ability to test your applications entire HTTP stack without having to provide mocks for anything in the stack. Because it's hosted In Process, it's really fast and takes very little effort to use.
+
+## Installation
+
+Pre-requisites: The project is built in .net v4.0.
+
+* From source: https://github.com/justeat/JustFakeIt
+* By hand: https://www.nuget.org/packages/JustFakeIt
+
+Via NuGet:
+
+		PM> Install-Package JustFakeIt
+
+
+## Getting Started
+
+Once you have the package installed into your test project, a standard wire-up will look like this.
+
+```csharp
+```
+
+## Contributing
+
+If you find a bug, have a feature request or even want to contribute an enhancement or fix, please follow the contributing guidelines included in the repository.
+
+
+## Copyright
+
+Copyright © JUST EAT PLC 2014

@@ -1,0 +1,4 @@
+This file contains a list of people who have made significant contributions.                 
+
+Cosmin Onea
+Jaimal Chohan <jaimalchohan@gmail.com>
