@@ -14,7 +14,7 @@
         <tags>owim testing</tags>
         <dependencies>
             <dependency id="Microsoft.Owin.SelfHost" version="[2.1.0]" />
-            <dependency id="Newtonsoft.Json" version="[6, 7)"" />
+            <dependency id="Newtonsoft.Json" version="[6, 7)" />
         </dependencies>
     </metadata>
     <files>
