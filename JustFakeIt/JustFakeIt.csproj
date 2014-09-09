@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expect.cs" />
     <Compile Include="Http.cs" />
     <Compile Include="FakeServer.cs" />
     <Compile Include="HttpExpectation.cs" />

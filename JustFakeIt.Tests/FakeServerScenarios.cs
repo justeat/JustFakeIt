@@ -2,7 +2,6 @@
 using System.Net;
 using FluentAssertions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace JustFakeIt.Tests
@@ -19,7 +18,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.ExpectGet(url).Returns(expectedResult);
+                fakeServer.Expect.Get(url).Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -39,7 +38,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.ExpectGet(url).Returns(expectedResult);
+                fakeServer.Expect.Get(url).Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -59,7 +58,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.ExpectPost(url, string.Empty).Returns(expectedResult);
+                fakeServer.Expect.Post(url, string.Empty).Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -79,7 +78,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.ExpectPost(url, "jibberish").Returns(expectedResult);
+                fakeServer.Expect.Post(url, "jibberish").Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -97,7 +96,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.ExpectGet("/some-jibberish-url").Returns(expectedResult);
+                fakeServer.Expect.Get("/some-jibberish-url").Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -116,7 +115,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.ExpectGet(path).Returns(expectedResult);
+                fakeServer.Expect.Get(path).Returns(expectedResult);
 
                 fakeServer.Start();
 

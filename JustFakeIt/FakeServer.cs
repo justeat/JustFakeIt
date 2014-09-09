@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.Owin;
 using Microsoft.Owin.Hosting;
@@ -10,15 +9,15 @@ namespace JustFakeIt
     public class FakeServer : IDisposable
     {
         private readonly Uri _baseUri;
+        public Expect Expect { get; protected set; }
 
         public FakeServer(Uri baseUri)
         {
             _baseUri = baseUri;
-            _expectations = new List<HttpExpectation>();
+            Expect = new Expect();
         }
 
         private IDisposable _webApp;
-        private readonly List<HttpExpectation> _expectations;
 
         public void Dispose()
         {
@@ -29,7 +28,7 @@ namespace JustFakeIt
         {
             _webApp = WebApp.Start(_baseUri.ToString(), app =>
             {
-                foreach (var expectation in _expectations)
+                foreach (var expectation in Expect.Expectations)
                 {
                     app.MapWhen(
                         context => RequestAndExpectedHttpMethodAndPathsMatch(context, expectation),
@@ -75,30 +74,6 @@ namespace JustFakeIt
         private static bool RequestAndExpectedHttpMethodsMatch(IOwinContext context, HttpExpectation expectation)
         {
             return context.Request.Method.Equals(expectation.Request.Method.ToString(), StringComparison.OrdinalIgnoreCase);
-        }
-
-        public HttpExpectation ExpectGet(string url)
-        {
-            var httpExpectation = new HttpExpectation
-            {
-                Request = new HttpRequestExpectation(Http.Get, url),
-            };
-
-            _expectations.Add(httpExpectation);
-
-            return httpExpectation;
-        }
-
-        public HttpExpectation ExpectPost(string url, string body)
-        {
-            var httpExpectation = new HttpExpectation
-            {
-                Request = new HttpRequestExpectation(Http.Post, url, body),
-            };
-
-            _expectations.Add(httpExpectation);
-
-            return httpExpectation;
         }
     }
 }
