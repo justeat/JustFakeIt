@@ -41,5 +41,17 @@ namespace JustFakeIt
 
             return httpExpectation;
         }
+
+        public HttpExpectation Delete(string url)
+        {
+            var httpExpectation = new HttpExpectation
+            {
+                Request = new HttpRequestExpectation(Http.Delete, url),
+            };
+
+            Expectations.Add(httpExpectation);
+
+            return httpExpectation;
+        }
     }
 }
