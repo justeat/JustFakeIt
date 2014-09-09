@@ -88,5 +88,42 @@ namespace JustFakeIt.Tests
                 ((HttpWebResponse)ex.Response).StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
             }
         }
+
+        [Fact]
+        public void FakeServer_ExpectGetWithMismatchingPath_Returns404()
+        {
+            const string expectedResult = "Some String Data";
+            const string baseAddress = "http://localhost:12354";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.ExpectGet("/some-jibberish-url").Returns(expectedResult);
+
+                fakeServer.Start();
+
+                var ex = Assert.Throws<WebException>(() => new WebClient().DownloadString(new Uri(baseAddress + "/home")));
+
+                ((HttpWebResponse)ex.Response).StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+            }
+        }
+
+        [Fact]
+        public void FakeServer_ExpectGetWithMismatchingMethod_Returns404()
+        {
+            const string expectedResult = "Some String Data";
+            const string baseAddress = "http://localhost:12354";
+            const string path = "/some-url";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.ExpectGet(path).Returns(expectedResult);
+
+                fakeServer.Start();
+
+                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(new Uri(baseAddress + path), string.Empty));
+
+                ((HttpWebResponse)ex.Response).StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+            }
+        }
     }
 }
