@@ -31,7 +31,7 @@ namespace JustFakeIt
                 foreach (var expectation in Expect.Expectations)
                 {
                     app.MapWhen(
-                        context => RequestAndExpectedHttpMethodAndPathsMatch(context, expectation),
+                        context => RequestAndExpectedHttpMethodAndPathsMatch(context, expectation.Request),
                         builder => builder.Run(context =>
                         {
                             context.Response.Headers.Add("Content-Type", new[] {"application/json"});
@@ -42,38 +42,12 @@ namespace JustFakeIt
             });
         }
 
-        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpExpectation expectation)
+        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation)
         {
-            return RequestAndExpectedHttpMethodsMatch(context, expectation) &&
-                   RequestAndExpectedPathsMatch(context, expectation) &&
-                   RequestAndExpectedBodiesMatch(context, expectation);
-        }
-
-        private static bool RequestAndExpectedBodiesMatch(IOwinContext context, HttpExpectation expectation)
-        {
-            if(context.Request.Body.Length == 0 && string.IsNullOrEmpty(expectation.Request.Body))
-            {
-                return true;
-            }
-
-            string requestBody;
-
-            using (var sr = new StreamReader(context.Request.Body))
-            {
-                requestBody = sr.ReadToEnd();
-            }
-
-            return requestBody.Equals(expectation.Request.Body);
-        }
-
-        private static bool RequestAndExpectedPathsMatch(IOwinContext context, HttpExpectation expectation)
-        {
-            return context.Request.Path.Equals(new PathString(expectation.Request.Url));
-        }
-
-        private static bool RequestAndExpectedHttpMethodsMatch(IOwinContext context, HttpExpectation expectation)
-        {
-            return context.Request.Method.Equals(expectation.Request.Method.ToString(), StringComparison.OrdinalIgnoreCase);
+            return 
+                requestExpectation.MatchesActualPath(context.Request.Path) &&
+                requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
+                requestExpectation.MatchesActualBody(context.Request.Body);
         }
     }
 }
