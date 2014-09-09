@@ -35,7 +35,7 @@ namespace JustFakeIt
                         builder => builder.Run(context =>
                         {
                             context.Response.Headers.Add("Content-Type", new[] {"application/json"});
-                            context.Response.StatusCode = expectation.Response.StatusCode;
+                            context.Response.StatusCode = (int)expectation.Response.StatusCode;
                             return context.Response.WriteAsync(expectation.Response.ExpectedResult);
                         }));
                 }

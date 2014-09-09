@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
+using System.Security.AccessControl;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Xunit;
@@ -164,5 +166,28 @@ namespace JustFakeIt.Tests
                 result.Should().Be(expectedResult);
             }
         }
+
+        [Fact]
+        public void FakeServer_ExpectPutWithNoBodyReturns201_Returns201()
+        {
+            const string expectedResult = "Some String Data";
+            const string baseAddress = "http://localhost:12354";
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.Expect.Put(url, string.Empty).Returns(HttpStatusCode.Created, expectedResult);
+
+                fakeServer.Start();
+
+                var t = new HttpClient().PutAsync(new Uri(baseAddress + url), new StringContent(String.Empty));
+                t.Wait();
+                var result = t.Result;
+                
+                result.StatusCode.Should().Be(HttpStatusCode.Created);
+            }
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Net;
+using Newtonsoft.Json;
 
 namespace JustFakeIt
 {
@@ -12,12 +13,17 @@ namespace JustFakeIt
 
         public void Returns(string expectedResult)
         {
-            Response = new HttpResponseExpectation(HttpStatusCode.Ok, expectedResult);
+            Response = new HttpResponseExpectation(HttpStatusCode.OK, expectedResult);
         }
         
         public void Returns(object expectedResult)
         {
-            Response = new HttpResponseExpectation(HttpStatusCode.Ok, JsonConvert.SerializeObject( expectedResult));
+            Response = new HttpResponseExpectation(HttpStatusCode.OK, JsonConvert.SerializeObject( expectedResult));
+        }
+
+        public void Returns(HttpStatusCode expectedStatusCode, string someStringData)
+        {
+            Response = new HttpResponseExpectation(expectedStatusCode, someStringData);
         }
     }
 }

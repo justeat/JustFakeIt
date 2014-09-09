@@ -1,13 +1,15 @@
-﻿namespace JustFakeIt
+﻿using System.Net;
+
+namespace JustFakeIt
 {
     public class HttpResponseExpectation
     {
-        public int StatusCode { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
         public string ExpectedResult { get; set; }
 
-        public HttpResponseExpectation(int statusCode, string expectedResult)
+        public HttpResponseExpectation(HttpStatusCode expectedStatusCode, string expectedResult)
         {
-            StatusCode = statusCode;
+            StatusCode = expectedStatusCode;
             ExpectedResult = expectedResult;
         }
     }

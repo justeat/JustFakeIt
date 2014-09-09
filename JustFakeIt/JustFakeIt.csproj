@@ -64,7 +64,6 @@
     <Compile Include="HttpExpectation.cs" />
     <Compile Include="HttpRequestExpectation.cs" />
     <Compile Include="HttpResponseExpectation.cs" />
-    <Compile Include="HttpStatusCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
