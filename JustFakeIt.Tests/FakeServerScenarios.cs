@@ -189,5 +189,27 @@ namespace JustFakeIt.Tests
             }
         }
 
+        [Fact]
+        public void FakeServer_ExpectPutWithObjectBodyReturns201_Returns201()
+        {
+            var expectedResult = new {RestaurantId = 1234};
+            const string baseAddress = "http://localhost:12354";
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.Expect.Put(url, string.Empty).Returns(HttpStatusCode.Created, expectedResult);
+
+                fakeServer.Start();
+
+                var t = new HttpClient().PutAsync(new Uri(baseAddress + url), new StringContent(String.Empty));
+                t.Wait();
+                var result = t.Result;
+
+                result.StatusCode.Should().Be(HttpStatusCode.Created);
+            }
+        }
+
     }
 }
