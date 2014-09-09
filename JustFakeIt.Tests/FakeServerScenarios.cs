@@ -19,7 +19,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.Expect(Http.Get, url).Returns(expectedResult);
+                fakeServer.ExpectGet(url).Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -39,7 +39,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.Expect(Http.Get, url).Returns(expectedResult);
+                fakeServer.ExpectGet(url).Returns(expectedResult);
 
                 fakeServer.Start();
 
@@ -59,13 +59,33 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(new Uri(baseAddress)))
             {
-                fakeServer.Expect(Http.Post, url).Returns(expectedResult);
+                fakeServer.ExpectPost(url, string.Empty).Returns(expectedResult);
 
                 fakeServer.Start();
 
                 var result = new WebClient().UploadString(new Uri(baseAddress + url), string.Empty);
 
                 result.Should().Be(expectedResult);
+            }
+        }
+
+        [Fact]
+        public void FakeServer_ExpectPostWithMismatchingBody_Returns404()
+        {
+            const string expectedResult = "Some String Data";
+            const string baseAddress = "http://localhost:12354";
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.ExpectPost(url, "jibberish").Returns(expectedResult);
+
+                fakeServer.Start();
+
+                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(new Uri(baseAddress + url), string.Empty));
+
+                ((HttpWebResponse)ex.Response).StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
             }
         }
     }

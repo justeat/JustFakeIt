@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Owin;
 using Microsoft.Owin.Hosting;
 using Owin;
@@ -45,7 +46,25 @@ namespace JustFakeIt
         private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpExpectation expectation)
         {
             return RequestAndExpectedHttpMethodsMatch(context, expectation) &&
-                   RequestAndExpectedPathsMatch(context, expectation);
+                   RequestAndExpectedPathsMatch(context, expectation) &&
+                   RequestAndExpectedBodiesMatch(context, expectation);
+        }
+
+        private static bool RequestAndExpectedBodiesMatch(IOwinContext context, HttpExpectation expectation)
+        {
+            if(context.Request.Body.Length == 0 && string.IsNullOrEmpty(expectation.Request.Body))
+            {
+                return true;
+            }
+
+            string requestBody;
+
+            using (var sr = new StreamReader(context.Request.Body))
+            {
+                requestBody = sr.ReadToEnd();
+            }
+
+            return requestBody.Equals(expectation.Request.Body);
         }
 
         private static bool RequestAndExpectedPathsMatch(IOwinContext context, HttpExpectation expectation)
@@ -58,11 +77,23 @@ namespace JustFakeIt
             return context.Request.Method.Equals(expectation.Request.Method.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public HttpExpectation Expect(Http method, string url)
+        public HttpExpectation ExpectGet(string url)
         {
             var httpExpectation = new HttpExpectation
             {
-                Request = new HttpRequestExpectation(method, url),
+                Request = new HttpRequestExpectation(Http.Get, url),
+            };
+
+            _expectations.Add(httpExpectation);
+
+            return httpExpectation;
+        }
+
+        public HttpExpectation ExpectPost(string url, string body)
+        {
+            var httpExpectation = new HttpExpectation
+            {
+                Request = new HttpRequestExpectation(Http.Post, url, body),
             };
 
             _expectations.Add(httpExpectation);
