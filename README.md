@@ -54,7 +54,7 @@ public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
 
 ## Contributing
 
-If you find a bug, have a feature request or even want to contribute an enhancement or fix, please follow the contributing guidelines included in the repository.
+If you find a bug, have a feature request or even want to contribute an enhancement or fix, please follow the [contributing guidelines](CONTRIBUTING.md) included in the repository.
 
 
 ## Copyright
