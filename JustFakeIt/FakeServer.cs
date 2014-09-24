@@ -45,7 +45,7 @@ namespace JustFakeIt
         private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation)
         {
             return 
-                requestExpectation.MatchesActualPath(context.Request.Path) &&
+                requestExpectation.MatchesActualPath(new PathString(context.Request.Uri.PathAndQuery)) &&
                 requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
                 requestExpectation.MatchesActualBody(context.Request.Body);
         }
