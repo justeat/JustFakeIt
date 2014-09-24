@@ -29,6 +29,26 @@ namespace JustFakeIt.Tests
                 result.Should().Be(expectedResult);
             }
         }
+        
+        [Fact]
+        public void FakeServer_ExpectGetWithQueryParametersReturnsString_ResponseMatchesExpectation()
+        {
+            const string expectedResult = "Some String Data";
+            const string baseAddress = "http://localhost:12354";
+            
+            const string url = "/some-url?id=1234";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.Expect.Get(url).Returns(expectedResult);
+
+                fakeServer.Start();
+
+                var result = new WebClient().DownloadString(new Uri(baseAddress + url));
+
+                result.Should().Be(expectedResult);
+            }
+        }
 
         [Fact]
         public void FakeServer_ExpectGetReturnsObject_ResponseMatchesExpectation()
