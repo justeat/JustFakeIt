@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Microsoft.Owin;
 using Microsoft.Owin.Hosting;
 using Owin;
@@ -42,10 +41,10 @@ namespace JustFakeIt
             });
         }
 
-        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation)
+        private bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation)
         {
-            return 
-                requestExpectation.MatchesActualPath(context.Request.Path) &&
+            return
+                requestExpectation.MatchesActualPath(context.Request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)) &&
                 requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
                 requestExpectation.MatchesActualBody(context.Request.Body);
         }
