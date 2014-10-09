@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Security.AccessControl;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Xunit;
@@ -206,6 +207,34 @@ namespace JustFakeIt.Tests
                 var result = t.Result;
                 
                 result.StatusCode.Should().Be(HttpStatusCode.Created);
+            }
+        }
+
+        [Fact]
+        public void FakeServer_ExpectPutWithComplexBodyReturnsComplexObject()
+        {
+            const string expectedResult = "{\"Complex\":{\"Property1\":1,\"Property2\":true}}";
+            const string body = "{\"Complex\":1}";
+            const string baseAddress = "http://localhost:1235";
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+            {
+                fakeServer.Expect.Put(url, body).Returns(HttpStatusCode.Created, expectedResult);
+
+                fakeServer.Start();
+
+                var t = new HttpClient().PutAsync(new Uri(baseAddress + url), new StringContent(body));
+                t.Wait();
+                var result = t.Result;
+
+                var resultTask = result.Content.ReadAsStringAsync();
+                resultTask.Wait();
+
+                result.StatusCode.Should().Be(HttpStatusCode.Created);
+                resultTask.Result.Should().Be(expectedResult);
+                
             }
         }
 

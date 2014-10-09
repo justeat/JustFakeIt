@@ -19,11 +19,6 @@ namespace JustFakeIt
 
         public static bool MatchesActualBody(this HttpRequestExpectation expected, Stream actualBody)
         {
-            if (actualBody.Length == 0 && string.IsNullOrEmpty(expected.Body))
-            {
-                return true;
-            }
-
             string stringBody;
 
             using (var sr = new StreamReader(actualBody))
@@ -31,7 +26,7 @@ namespace JustFakeIt
                 stringBody = sr.ReadToEnd();
             }
 
-            return stringBody.Equals(expected.Body);
+            return string.IsNullOrEmpty(expected.Body) || stringBody.Equals(expected.Body);
         }
     }
 }
