@@ -12,7 +12,7 @@ _An InProcess HTTP server which can be mocked and asserted against to allow for 
 
 ## Introduction
 
-JustFaxkeIt is a mockable HTTP server which is hosted within your unit test process and provides you with the ability to test your applications entire HTTP stack without having to provide mocks for anything in the stack. Because it's hosted In Process, it's really fast and takes very little effort to use.
+JustFakeIt is a mockable HTTP server which is hosted within your unit test process and provides you with the ability to test your applications entire HTTP stack without having to provide mocks for anything in the stack. Because it's hosted In Process, it's really fast and takes very little effort to use.
 
 ## Installation
 
