@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Microsoft.Owin;
 using Microsoft.Owin.Hosting;
 using Owin;
@@ -21,6 +23,13 @@ namespace JustFakeIt
         public void Dispose()
         {
             _webApp.Dispose();
+
+            // Owin Hosting adds trace listeners to the Trace
+            // just removing them here to keep the environment clean
+            Trace.Listeners.Cast<TraceListener>()
+                .Where(listener => listener.Name == "HostingTraceListener")
+                .ToList()
+                .ForEach(x => Trace.Listeners.Remove(x));
         }
 
         public void Start()
