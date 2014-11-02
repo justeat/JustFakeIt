@@ -14,6 +14,8 @@ _An InProcess HTTP server which can be mocked and asserted against to allow for 
 
 JustFakeIt is a mockable HTTP server which is hosted within your unit test process and provides you with the ability to test your applications entire HTTP stack without having to provide mocks for anything in the stack. Because it's hosted In Process, it's really fast and takes very little effort to use.
 
+It will configure itself as a default proxy and let you hook any WebRequest based client by default, intercepting all outbound Http calls in scope.
+
 ## Installation
 
 Pre-requisites: The project is built in .net v4.0.
@@ -33,21 +35,15 @@ Once you have the package installed into your test project, a standard wire-up w
 ```
 [Fact]
 public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
-{
-    const string expectedResult = "Some String Data";
-    const string baseAddress = "http://localhost:12354";
-    
-    const string url = "/some-url";
-
-    using (var fakeServer = new FakeServer(new Uri(baseAddress)))
+{    
+    using (var fakeServer = new FakeServer(12354))
     {
-        fakeServer.Expect.Get(url).Returns(expectedResult);
-
+        fakeServer.Expect.Get("/123").Returns("Some String Data");
         fakeServer.Start();
 
-        var result = new WebClient().DownloadString(new Uri(baseAddress + url));
+        var result = new WebClient().DownloadString(new Uri("http://www.anything-at-all.com/123"));
 
-        result.Should().Be(expectedResult);
+        result.Should().Be("Some String Data");
     }
 }
 ```
