@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Owin;
+using System.Net;
+using System.Net.Cache;
 using Microsoft.Owin.Hosting;
 using Owin;
 
@@ -9,53 +10,48 @@ namespace JustFakeIt
 {
     public class FakeServer : IDisposable
     {
-        private readonly Uri _baseUri;
+        public Uri BaseUri { get; private set; }
         public Expect Expect { get; protected set; }
 
-        public FakeServer(Uri baseUri)
+        private IDisposable _webApp;
+        private IWebProxy _initialProxy;
+        private RequestCachePolicy _initialCachePolicy;
+
+        public FakeServer(int basePort)
         {
-            _baseUri = baseUri;
+            BaseUri = new Uri("http://127.0.0.1:" + basePort);
             Expect = new Expect();
         }
 
-        private IDisposable _webApp;
-
         public void Dispose()
         {
-            _webApp.Dispose();
-
+             _webApp.Dispose();
+            
             // Owin Hosting adds trace listeners to the Trace
             // just removing them here to keep the environment clean
             Trace.Listeners.Cast<TraceListener>()
                 .Where(listener => listener.Name == "HostingTraceListener")
                 .ToList()
                 .ForEach(x => Trace.Listeners.Remove(x));
+
+            WebRequest.DefaultWebProxy = _initialProxy;
+            WebRequest.DefaultCachePolicy = _initialCachePolicy;
         }
 
         public void Start()
         {
-            _webApp = WebApp.Start(_baseUri.ToString(), app =>
-            {
-                foreach (var expectation in Expect.Expectations)
-                {
-                    app.MapWhen(
-                        context => RequestAndExpectedHttpMethodAndPathsMatch(context, expectation.Request),
-                        builder => builder.Run(context =>
-                        {
-                            context.Response.Headers.Add("Content-Type", new[] {"application/json"});
-                            context.Response.StatusCode = (int)expectation.Response.StatusCode;
-                            return context.Response.WriteAsync(expectation.Response.ExpectedResult);
-                        }));
-                }
-            });
-        }
+            _webApp = WebApp.Start(BaseUri.ToString(), app => app.Use<ProxyMiddleware>(Expect));
 
-        private bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation)
-        {
-            return
-                requestExpectation.MatchesActualPath(context.Request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)) &&
-                requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
-                requestExpectation.MatchesActualBody(context.Request.Body);
+            _initialProxy = WebRequest.DefaultWebProxy;
+            _initialCachePolicy = WebRequest.DefaultCachePolicy;
+
+            WebRequest.DefaultCachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+            WebRequest.DefaultWebProxy = new WebProxy(BaseUri, false)
+            {
+                UseDefaultCredentials = true,
+                BypassList = new string[] {},
+                Credentials = CredentialCache.DefaultCredentials,
+            };
         }
     }
 }
