@@ -44,11 +44,14 @@ namespace JustFakeIt.Tests
         public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
-            const string baseAddress = "http://localhost:12354";
+
+            var port = Ports.GetFreeTcpPort();
+
+            var baseAddress = "http://localhost:" + port;
             
             const string url = "/some-url";
 
-            using (var fakeServer = new FakeServer(12354))
+            using (var fakeServer = new FakeServer(port))
             {
                 fakeServer.Expect.Get(url).Returns(expectedResult);
                 fakeServer.Start();
