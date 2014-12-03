@@ -25,7 +25,8 @@ namespace JustFakeIt
 
         public void Dispose()
         {
-             _webApp.Dispose();
+            if(_webApp != null)
+                _webApp.Dispose();
             
             // Owin Hosting adds trace listeners to the Trace
             // just removing them here to keep the environment clean

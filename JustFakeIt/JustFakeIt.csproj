@@ -70,6 +70,7 @@
     <Compile Include="HttpExpectation.cs" />
     <Compile Include="HttpRequestExpectation.cs" />
     <Compile Include="HttpResponseExpectation.cs" />
+    <Compile Include="Ports.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProxyMiddleware.cs" />
   </ItemGroup>
