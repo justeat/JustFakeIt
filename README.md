@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/3c20wb6doej6wqv6?svg=true)](https://ci.appveyor.com/project/justeattech/justfakeit)
 JustFakeIt
 ==========
 _An InProcess HTTP server which can be mocked and asserted against to allow for full stack HTTP testing_
