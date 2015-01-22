@@ -31,6 +31,12 @@ namespace JustFakeIt
                 return context.Response.WriteAsync(new byte[0]);
             }
 
+            foreach (var key in matchingExpectation.Response.Headers.AllKeys)
+            {
+                // BUG: http allows duplicate headers; this doesn't.
+                context.Response.Headers.Add(key, new [] {matchingExpectation.Response.Headers[key]});
+            }
+
             context.Response.Headers.Add("Content-Type", new[] {"application/json"});
             context.Response.StatusCode = (int)matchingExpectation.Response.StatusCode;
             return context.Response.WriteAsync(matchingExpectation.Response.ExpectedResult);

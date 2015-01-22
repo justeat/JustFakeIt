@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Specialized;
+using System.Net;
 using Newtonsoft.Json;
 
 namespace JustFakeIt
@@ -8,24 +9,24 @@ namespace JustFakeIt
         public HttpRequestExpectation Request { get; set; }
         public HttpResponseExpectation Response { get; set; }
 
-        public void Returns(string expectedResult)
+        public void Returns(string expectedResult, WebHeaderCollection expectedHeaders = null)
         {
-            Response = new HttpResponseExpectation(HttpStatusCode.OK, expectedResult);
-        }
-        
-        public void Returns(object expectedResult)
-        {
-            Response = new HttpResponseExpectation(HttpStatusCode.OK, JsonConvert.SerializeObject(expectedResult));
+            Returns(HttpStatusCode.OK, expectedResult, expectedHeaders);
         }
 
-        public void Returns(HttpStatusCode expectedStatusCode, string someStringData)
+        public void Returns(object expectedResult, WebHeaderCollection expectedHeaders = null)
         {
-            Response = new HttpResponseExpectation(expectedStatusCode, someStringData);
+            Returns(HttpStatusCode.OK, JsonConvert.SerializeObject(expectedResult), expectedHeaders);
         }
 
-        public void Returns(HttpStatusCode expectedStatusCode, object expectedResult)
+        public void Returns(HttpStatusCode expectedStatusCode, string someStringData, WebHeaderCollection expectedHeaders = null)
         {
-            Response = new HttpResponseExpectation(expectedStatusCode, JsonConvert.SerializeObject(expectedResult));
+            Response = new HttpResponseExpectation(expectedStatusCode, someStringData, expectedHeaders);
+        }
+
+        public void Returns(HttpStatusCode expectedStatusCode, object expectedResult, WebHeaderCollection expectedHeaders = null)
+        {
+            Returns(expectedStatusCode, JsonConvert.SerializeObject(expectedResult), expectedHeaders);
         }
     }
 }
