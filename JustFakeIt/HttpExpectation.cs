@@ -10,12 +10,12 @@ namespace JustFakeIt
 
         public void Returns(string expectedResult)
         {
-            Response = new HttpResponseExpectation(HttpStatusCode.OK, expectedResult);
+            Returns(HttpStatusCode.OK, expectedResult);
         }
         
         public void Returns(object expectedResult)
         {
-            Response = new HttpResponseExpectation(HttpStatusCode.OK, JsonConvert.SerializeObject(expectedResult));
+            Returns(HttpStatusCode.OK, JsonConvert.SerializeObject(expectedResult));
         }
 
         public void Returns(HttpStatusCode expectedStatusCode, string someStringData)
@@ -25,7 +25,7 @@ namespace JustFakeIt
 
         public void Returns(HttpStatusCode expectedStatusCode, object expectedResult)
         {
-            Response = new HttpResponseExpectation(expectedStatusCode, JsonConvert.SerializeObject(expectedResult));
+            Returns(expectedStatusCode, JsonConvert.SerializeObject(expectedResult));
         }
     }
 }
