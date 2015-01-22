@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http;
 using FluentAssertions;
@@ -61,7 +62,31 @@ namespace JustFakeIt.Tests
                 result.Should().Be(expectedResult);
             }
         }
-        
+
+        [Fact]
+        public void FakeServer_ExpectGetWithHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
+        {
+            const string expectedResult = "Some String Data";
+
+            var port = Ports.GetFreeTcpPort();
+
+            var baseAddress = "http://localhost:" + port;
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(port))
+            {
+                fakeServer.Expect.Get(url).Returns(expectedResult, new WebHeaderCollection { { "foo", "bar" } });
+                fakeServer.Start();
+
+                var client = new HttpClient {BaseAddress = new Uri(baseAddress)};
+                var result = client.GetAsync(url).Result;
+
+                result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
+                result.Headers.Should().ContainSingle(x => x.Key == "foo");
+            }
+        }
+
         [Fact]
         public void FakeServer_ExpectGetWithQueryParametersReturnsString_ResponseMatchesExpectation()
         {
