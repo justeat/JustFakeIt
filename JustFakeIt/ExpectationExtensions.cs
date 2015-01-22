@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using Microsoft.Owin;
 
 namespace JustFakeIt
 {
-    public static class ExpetcationExtensions
+    public static class ExpectationExtensions
     {
         public static bool MatchesActualPath(this HttpRequestExpectation expected, string actualPath)
         {
