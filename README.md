@@ -1,6 +1,8 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/3c20wb6doej6wqv6?svg=true)](https://ci.appveyor.com/project/justeattech/justfakeit)
 JustFakeIt
 ==========
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/justeat/JustFakeIt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 _An InProcess HTTP server which can be mocked and asserted against to allow for full stack HTTP testing_
 
 ---
