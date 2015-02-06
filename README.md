@@ -51,6 +51,13 @@ public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
 }
 ```
 
+Ignore parameters by replacing the value with "{ignore}"
+
+```
+ var fakeurl = "/some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
+ fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
+```
+
 ## Contributing
 
 If you find a bug, have a feature request or even want to contribute an enhancement or fix, please follow the [contributing guidelines](CONTRIBUTING.md) included in the repository.

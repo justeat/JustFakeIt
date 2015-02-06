@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http;
 using FluentAssertions;
@@ -305,6 +304,29 @@ namespace JustFakeIt.Tests
                 var result = t.Result;
 
                 result.StatusCode.Should().Be(HttpStatusCode.Created);
+            }
+        }
+
+
+        [Fact]
+        public void FakeServer_IgnoredParameter_Returns200()
+        {
+            var expectedResult = new { ResourceId = 1234 };
+            const string baseAddress = "http://localhost:12354";
+
+            const string fakeurl = "/some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
+            const string actualurl = "/some-resource/1234/some-resource?date=2015-02-06T09:52:10&type=1";
+
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
+                fakeServer.Start();
+
+                var t = new HttpClient().GetAsync(new Uri(baseAddress + actualurl));
+                t.Wait();
+                var result = t.Result;
+
+                result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             }
         }
 
