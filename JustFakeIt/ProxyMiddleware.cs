@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions.Events;
 using Microsoft.Owin;
 
 namespace JustFakeIt
