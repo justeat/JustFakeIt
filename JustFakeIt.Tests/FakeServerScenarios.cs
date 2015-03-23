@@ -10,52 +10,18 @@ namespace JustFakeIt.Tests
     public class FakeServerScenarios
     {
         [Fact]
-        public void FakeServer_NewWebClientCreated_ProxyShouldBeConfigured()
-        {
-            using (var fakeServer = new FakeServer(12354))
-            {
-                fakeServer.Start();
-
-                var wc = new WebClient();
-                var defaultWebProxyForUri = WebRequest.DefaultWebProxy.GetProxy(new Uri("http://www.google.com/some-url2"));
-
-                defaultWebProxyForUri.Should().Be(fakeServer.BaseUri);
-                ((WebProxy) wc.Proxy).Address.Should().Be(fakeServer.BaseUri);
-            }
-        }
-
-        [Fact]
-        public void FakeServer_RequestingAUriThatHasNotBeenModified_ResponseMatchesExpectation()
-        {
-            const string expectedResult = "Some String Data";
-
-            using (var fakeServer = new FakeServer(12354))
-            {
-                fakeServer.Expect.Get("/123").Returns(expectedResult);
-                fakeServer.Start();
-                
-                var result = new WebClient().DownloadString(new Uri("http://www.bing.com/123"));
-
-                result.Should().Be(expectedResult);
-            }
-        }
-
-        [Fact]
         public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
 
-            var port = Ports.GetFreeTcpPort();
-
-            var baseAddress = "http://localhost:" + port;
-            
             const string url = "/some-url";
 
-            using (var fakeServer = new FakeServer(port))
+            using (var fakeServer = new FakeServer())
             {
                 fakeServer.Expect.Get(url).Returns(expectedResult);
                 fakeServer.Start();
-
+                
+                var baseAddress = fakeServer.BaseUri;
                 var result = new WebClient().DownloadString(new Uri(baseAddress + url));
 
                 result.Should().Be(expectedResult);
