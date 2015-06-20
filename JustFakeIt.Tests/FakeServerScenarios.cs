@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using FluentAssertions;
@@ -293,6 +294,32 @@ namespace JustFakeIt.Tests
                 var result = t.Result;
 
                 result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            }
+        }
+
+        [Fact]
+        public void FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
+        {
+            var expectedResult = new { ResourceId = 1234 };
+            const string baseAddress = "http://localhost:12354";
+            var expectedResponseTime = TimeSpan.FromSeconds(5);
+
+            const string fakeurl = "/some-url";
+            
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.ResponseTime = expectedResponseTime;
+                fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.OK, expectedResult);
+                fakeServer.Start();
+
+                var stopwatch = Stopwatch.StartNew();
+
+                var t = new HttpClient().GetAsync(new Uri(baseAddress) + fakeurl);
+                t.Wait();
+
+                stopwatch.Stop();
+
+                stopwatch.Elapsed.Should().BeGreaterOrEqualTo(expectedResponseTime);
             }
         }
 

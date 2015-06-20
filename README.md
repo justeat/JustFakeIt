@@ -58,6 +58,12 @@ Ignore parameters by replacing the value with "{ignore}"
  fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
 ```
 
+Set a response time by setting the ResponseTime property
+
+```
+ fakeServer.Expect.ResponseTime = TimeSpan.FromSeconds(5);
+```
+
 ## Contributing
 
 If you find a bug, have a feature request or even want to contribute an enhancement or fix, please follow the [contributing guidelines](CONTRIBUTING.md) included in the repository.

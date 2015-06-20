@@ -17,6 +17,8 @@ namespace JustFakeIt
 
         public override Task Invoke(IOwinContext context)
         {
+            var delayTask = Task.Delay(_expect.ResponseTime);
+
             Debug.WriteLine("Looking for registration that matches: ");
             Debug.WriteLine("\t\t\tPath:\t\t\t" + context.Request.Uri.PathAndQuery);
             Debug.WriteLine("\t\t\tMethod:\t\t\t" + context.Request.Method);
@@ -39,6 +41,9 @@ namespace JustFakeIt
 
             context.Response.Headers.Add("Content-Type", new[] {"application/json"});
             context.Response.StatusCode = (int)matchingExpectation.Response.StatusCode;
+
+            delayTask.Wait();
+
             return context.Response.WriteAsync(matchingExpectation.Response.ExpectedResult);
 
         }

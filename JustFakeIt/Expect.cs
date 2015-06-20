@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
 
 namespace JustFakeIt
 {
     public class Expect
     {
+        TimeSpan _responseTime = TimeSpan.Zero;
         internal List<HttpExpectation> Expectations = new List<HttpExpectation>();
-
+        
+        public TimeSpan ResponseTime { get; set; }
+        
         public HttpExpectation Post(string url, string body)
         {
             var httpExpectation = new HttpExpectation
