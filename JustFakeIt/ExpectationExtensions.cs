@@ -32,8 +32,13 @@ namespace JustFakeIt
                     }
                 }
 
-                actualPath = actualPath.Replace(actualPath.Substring(segmentEnd, nextSegmentStart - segmentEnd),
-                    IgnoreParameter);
+                var parameterLength = nextSegmentStart - segmentEnd;
+
+                if (parameterLength <= 0) continue;
+
+                var parameter = actualPath.Substring(segmentEnd, parameterLength);
+
+                actualPath = actualPath.Replace(parameter, IgnoreParameter);
             }
             return actualPath;
         }

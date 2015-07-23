@@ -298,6 +298,28 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
+        public void FakeServer_IgnoredParameterInRestfulUrl_Returns200()
+        {
+            var expectedResult = new { ResourceId = 1234 };
+            const string baseAddress = "http://localhost:12354";
+
+            const string fakeurl = "/some-resource/{ignore}/some-method";
+            const string actualurl = "/some-resource/1234/some-method";
+
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
+                fakeServer.Start();
+
+                var t = new HttpClient().GetAsync(new Uri(baseAddress + actualurl));
+                t.Wait();
+                var result = t.Result;
+
+                result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            }            
+        }
+
+        [Fact]
         public void FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
         {
             var expectedResult = new { ResourceId = 1234 };
