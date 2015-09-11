@@ -64,6 +64,12 @@ Set a response time by setting the ResponseTime property
  fakeServer.Expect.ResponseTime = TimeSpan.FromSeconds(5);
 ```
 
+Assert against captured requests
+
+```
+ fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == "/some-url").Should().Be(1);
+```
+
 ## Contributing
 
 If you find a bug, have a feature request or even want to contribute an enhancement or fix, please follow the [contributing guidelines](CONTRIBUTING.md) included in the repository.
