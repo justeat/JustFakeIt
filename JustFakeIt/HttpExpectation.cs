@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Net;
+﻿using System.Net;
 using Newtonsoft.Json;
 
 namespace JustFakeIt

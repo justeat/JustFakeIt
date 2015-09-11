@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Owin.Hosting;
@@ -11,7 +12,13 @@ namespace JustFakeIt
         public Uri BaseUri { get; private set; }
         public Expect Expect { get; protected set; }
 
+        public IReadOnlyList<HttpRequestExpectation> CapturedRequests
+        {
+            get { return _capturedRequests.ToArray(); }
+        }
+
         private IDisposable _webApp;
+        private readonly IList<HttpRequestExpectation> _capturedRequests;
 
         public FakeServer() : this(Ports.GetFreeTcpPort())
         {
@@ -21,6 +28,7 @@ namespace JustFakeIt
         {
             BaseUri = new UriBuilder(Uri.UriSchemeHttp, "127.0.0.1", basePort).Uri;
             Expect = new Expect();
+            _capturedRequests = new List<HttpRequestExpectation>();
         }
 
         public void Dispose()
@@ -38,7 +46,7 @@ namespace JustFakeIt
 
         public void Start()
         {
-            _webApp = WebApp.Start(BaseUri.ToString(), app => app.Use<ProxyMiddleware>(Expect));
+            _webApp = WebApp.Start(BaseUri.ToString(), app => app.Use<ProxyMiddleware>(Expect, _capturedRequests));
         }
     }
 }

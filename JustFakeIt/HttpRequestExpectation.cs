@@ -6,14 +6,10 @@ namespace JustFakeIt
         public string Url { get; private set; }
         public string Body { get; private set; }
 
-        public HttpRequestExpectation(Http method, string url)
+        public HttpRequestExpectation(Http method, string url, string body = null)
         {
             Method = method;
             Url = url;
-        }
-
-        public HttpRequestExpectation(Http method, string url, string body) : this(method, url)
-        {
             Body = body;
         }
     }

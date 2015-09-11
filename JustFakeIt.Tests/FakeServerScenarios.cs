@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using FluentAssertions;
@@ -342,6 +343,38 @@ namespace JustFakeIt.Tests
                 stopwatch.Stop();
 
                 stopwatch.Elapsed.Should().BeGreaterOrEqualTo(expectedResponseTime);
+            }
+        }
+
+        [Fact]
+        public void FakeServer_CapturesAllRequests()
+        {
+            using (var fakeServer = new FakeServer())
+            {
+                fakeServer.Start();
+                var baseAddress = fakeServer.BaseUri;
+                
+                Action<Action, int> repeat = (a, times) =>
+                {
+                    for (var i = 0; i < times; i++)
+                        a();
+                };
+
+                var url1 = "/request1";
+                var url2 = "/request2";
+                var url3 = "/request3";
+                var url4 = "/request4";
+
+                var httpClient = new HttpClient();
+                httpClient.DeleteAsync(new Uri(baseAddress + url1)).Wait();
+                repeat(() => httpClient.GetAsync(new Uri(baseAddress + url2)).Wait(), 2);
+                repeat(() => httpClient.PostAsync(new Uri(baseAddress + url3), new StringContent(url3)).Wait(), 3);
+                repeat(() => httpClient.PutAsync(new Uri(baseAddress + url4), new StringContent(url4)).Wait(), 4);
+
+                fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == url1).Should().Be(1);
+                fakeServer.CapturedRequests.Count(x => x.Method == Http.Get && x.Url == url2).Should().Be(2);
+                fakeServer.CapturedRequests.Count(x => x.Method == Http.Post && x.Url == url3 && x.Body == url3).Should().Be(3);
+                fakeServer.CapturedRequests.Count(x => x.Method == Http.Put && x.Url == url4 && x.Body == url4).Should().Be(4);
             }
         }
 
