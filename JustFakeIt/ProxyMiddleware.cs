@@ -45,7 +45,10 @@ namespace JustFakeIt
         {
             string body;
             using (var sr = new StreamReader(request.Body))
+            {
                 body = sr.ReadToEnd();
+            }
+
             request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
 
             if (_capturedRequests != null)
@@ -69,7 +72,9 @@ namespace JustFakeIt
         private Task ProcessMatchingExpectation(IOwinResponse response, HttpExpectation httpExpectation)
         {
             foreach (var key in httpExpectation.Response.Headers.AllKeys)
+            {
                 response.Headers.Add(key, new[] { httpExpectation.Response.Headers[key] });
+            }
 
             response.Headers.Add("Content-Type", new[] { "application/json" });
             response.StatusCode = (int)httpExpectation.Response.StatusCode;

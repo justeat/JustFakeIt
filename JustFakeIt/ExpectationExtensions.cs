@@ -34,7 +34,10 @@ namespace JustFakeIt
 
                 var parameterLength = nextSegmentStart - segmentEnd;
 
-                if (parameterLength <= 0) continue;
+                if (parameterLength <= 0)
+                {
+                    continue;
+                }
 
                 var parameter = actualPath.Substring(segmentEnd, parameterLength);
 

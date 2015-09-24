@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Xunit;
@@ -24,14 +25,15 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
                 
                 var baseAddress = fakeServer.BaseUri;
-                var result = new WebClient().DownloadString(new Uri(baseAddress + url));
+                var uri = new Uri(baseAddress + url);
+                var result = new WebClient().DownloadString(uri);
 
                 result.Should().Be(expectedResult);
             }
         }
 
         [Fact]
-        public void FakeServer_ExpectGetWithHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
+        public async Task FakeServer_ExpectGetWithHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
         {
             const string expectedResult = "Some String Data";
 
@@ -47,7 +49,7 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var client = new HttpClient {BaseAddress = new Uri(baseAddress)};
-                var result = client.GetAsync(url).Result;
+                var result = await client.GetAsync(url);
 
                 result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
                 result.Headers.Should().ContainSingle(x => x.Key == "foo");
@@ -68,7 +70,8 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var result = new WebClient().DownloadString(new Uri(baseAddress + url));
+                var uri = new Uri(baseAddress + url);
+                var result = new WebClient().DownloadString(uri);
 
                 result.Should().Be(expectedResult);
             }
@@ -88,7 +91,9 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var result = JsonConvert.DeserializeObject<dynamic>(new WebClient().DownloadString(new Uri(baseAddress + url)));
+                var uri = new Uri(baseAddress + url);
+                var stringResult = new WebClient().DownloadString(uri);
+                var result = JsonConvert.DeserializeObject<dynamic>(stringResult);
 
                 Assert.Equal(expectedResult.RestaurantId, (int)result.RestaurantId);
             }
@@ -108,7 +113,8 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var result = new WebClient().UploadString(new Uri(baseAddress + url), string.Empty);
+                var uri = new Uri(baseAddress + url);
+                var result = new WebClient().UploadString(uri, string.Empty);
 
                 result.Should().Be(expectedResult);
             }
@@ -128,7 +134,8 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(new Uri(baseAddress + url), string.Empty));
+                var uri = new Uri(baseAddress + url);
+                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(uri, string.Empty));
 
                 ((HttpWebResponse)ex.Response).StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -146,7 +153,8 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var ex = Assert.Throws<WebException>(() => new WebClient().DownloadString(new Uri(baseAddress + "/home")));
+                var uri = new Uri(baseAddress + "/home");
+                var ex = Assert.Throws<WebException>(() => new WebClient().DownloadString(uri));
 
                 ((HttpWebResponse)ex.Response).StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -165,7 +173,8 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(new Uri(baseAddress + path), string.Empty));
+                var uri = new Uri(baseAddress + path);
+                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(uri, string.Empty));
 
                 ((HttpWebResponse)ex.Response).StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -185,7 +194,8 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var result = new WebClient().UploadString(new Uri(baseAddress + url), "PUT", string.Empty);
+                var uri = new Uri(baseAddress + url);
+                var result = new WebClient().UploadString(uri, "PUT", string.Empty);
 
                 result.Should().Be(expectedResult);
             }
@@ -204,14 +214,15 @@ namespace JustFakeIt.Tests
                 fakeServer.Expect.Delete(url).Returns(expectedResult);
                 fakeServer.Start();
 
-                var result = new WebClient().UploadString(new Uri(baseAddress + url), "DELETE", string.Empty);
+                var uri = new Uri(baseAddress + url);
+                var result = new WebClient().UploadString(uri, "DELETE", string.Empty);
 
                 result.Should().Be(expectedResult);
             }
         }
 
         [Fact]
-        public void FakeServer_ExpectPutWithNoBodyReturns201_Returns201()
+        public async Task FakeServer_ExpectPutWithNoBodyReturns201_Returns201()
         {
             const string expectedResult = "Some String Data";
             const string baseAddress = "http://localhost:12354";
@@ -223,16 +234,15 @@ namespace JustFakeIt.Tests
                 fakeServer.Expect.Put(url, string.Empty).Returns(HttpStatusCode.Created, expectedResult);
                 fakeServer.Start();
 
-                var t = new HttpClient().PutAsync(new Uri(baseAddress + url), new StringContent(String.Empty));
-                t.Wait();
-                var result = t.Result;
+                var uri = new Uri(baseAddress + url);
+                var result = await new HttpClient().PutAsync(uri, new StringContent(String.Empty));
                 
                 result.StatusCode.Should().Be(HttpStatusCode.Created);
             }
         }
 
         [Fact]
-        public void FakeServer_ExpectPutWithComplexBodyReturnsComplexObject()
+        public async Task FakeServer_ExpectPutWithComplexBodyReturnsComplexObject()
         {
             const string expectedResult = "{\"Complex\":{\"Property1\":1,\"Property2\":true}}";
             const string body = "{\"Complex\":1}";
@@ -242,20 +252,18 @@ namespace JustFakeIt.Tests
                 fakeServer.Expect.Put("/some-url", body).Returns(HttpStatusCode.Created, expectedResult);
                 fakeServer.Start();
 
-                var t = new HttpClient().PutAsync(new Uri("http://localhost:12354" + "/some-url"), new StringContent(body));
-                t.Wait();
-                var result = t.Result;
+                var uri = new Uri("http://localhost:12354" + "/some-url");
+                var result = await new HttpClient().PutAsync(uri, new StringContent(body));
 
-                var resultTask = result.Content.ReadAsStringAsync();
-                resultTask.Wait();
+                var content = await result.Content.ReadAsStringAsync();
 
                 result.StatusCode.Should().Be(HttpStatusCode.Created);
-                resultTask.Result.Should().Be(expectedResult);
+                content.Should().Be(expectedResult);
             }
         }
 
         [Fact]
-        public void FakeServer_ExpectPutWithObjectBodyReturns201_Returns201()
+        public async Task FakeServer_ExpectPutWithObjectBodyReturns201_Returns201()
         {
             var expectedResult = new {RestaurantId = 1234};
             const string baseAddress = "http://localhost:12354";
@@ -267,9 +275,8 @@ namespace JustFakeIt.Tests
                 fakeServer.Expect.Put(url, string.Empty).Returns(HttpStatusCode.Created, expectedResult);
                 fakeServer.Start();
 
-                var t = new HttpClient().PutAsync(new Uri(baseAddress + url), new StringContent(String.Empty));
-                t.Wait();
-                var result = t.Result;
+                var uri = new Uri(baseAddress + url);
+                var result = await new HttpClient().PutAsync(uri, new StringContent(String.Empty));
 
                 result.StatusCode.Should().Be(HttpStatusCode.Created);
             }
@@ -277,7 +284,7 @@ namespace JustFakeIt.Tests
 
 
         [Fact]
-        public void FakeServer_IgnoredParameter_Returns200()
+        public async Task FakeServer_IgnoredParameter_Returns200()
         {
             var expectedResult = new { ResourceId = 1234 };
             const string baseAddress = "http://localhost:12354";
@@ -290,55 +297,53 @@ namespace JustFakeIt.Tests
                 fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
                 fakeServer.Start();
 
-                var t = new HttpClient().GetAsync(new Uri(baseAddress + actualurl));
-                t.Wait();
-                var result = t.Result;
+                var uri = new Uri(baseAddress + actualurl);
+                var result = await new HttpClient().GetAsync(uri);
 
                 result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             }
         }
 
         [Fact]
-        public void FakeServer_IgnoredParameterInRestfulUrl_Returns200()
+        public async Task FakeServer_IgnoredParameterInRestfulUrl_Returns200()
         {
             var expectedResult = new { ResourceId = 1234 };
             const string baseAddress = "http://localhost:12354";
 
-            const string fakeurl = "/some-resource/{ignore}/some-method";
-            const string actualurl = "/some-resource/1234/some-method";
+            const string fakeUrl = "/some-resource/{ignore}/some-method";
+            const string actualUrl = "/some-resource/1234/some-method";
 
             using (var fakeServer = new FakeServer(12354))
             {
-                fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
+                fakeServer.Expect.Get(fakeUrl).Returns(HttpStatusCode.Accepted, expectedResult);
                 fakeServer.Start();
 
-                var t = new HttpClient().GetAsync(new Uri(baseAddress + actualurl));
-                t.Wait();
-                var result = t.Result;
+                var uri = new Uri(baseAddress + actualUrl);
+                var result = await new HttpClient().GetAsync(uri);
 
                 result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             }            
         }
 
         [Fact]
-        public void FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
+        public async Task FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
         {
             var expectedResult = new { ResourceId = 1234 };
             const string baseAddress = "http://localhost:12354";
             var expectedResponseTime = TimeSpan.FromSeconds(5);
 
-            const string fakeurl = "/some-url";
+            const string fakeUrl = "/some-url";
             
             using (var fakeServer = new FakeServer(12354))
             {
                 fakeServer.Expect.ResponseTime = expectedResponseTime;
-                fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.OK, expectedResult);
+                fakeServer.Expect.Get(fakeUrl).Returns(HttpStatusCode.OK, expectedResult);
                 fakeServer.Start();
 
                 var stopwatch = Stopwatch.StartNew();
 
-                var t = new HttpClient().GetAsync(new Uri(baseAddress) + fakeurl);
-                t.Wait();
+                var uri = new Uri(baseAddress + fakeUrl);
+                await new HttpClient().GetAsync(uri);
 
                 stopwatch.Stop();
 
@@ -347,29 +352,23 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
-        public void FakeServer_CapturesAllRequests()
+        public async Task FakeServer_CapturesAllRequests()
         {
             using (var fakeServer = new FakeServer())
             {
                 fakeServer.Start();
                 var baseAddress = fakeServer.BaseUri;
                 
-                Action<Action, int> repeat = (a, times) =>
-                {
-                    for (var i = 0; i < times; i++)
-                        a();
-                };
-
                 var url1 = "/request1";
                 var url2 = "/request2";
                 var url3 = "/request3";
                 var url4 = "/request4";
 
                 var httpClient = new HttpClient();
-                httpClient.DeleteAsync(new Uri(baseAddress + url1)).Wait();
-                repeat(() => httpClient.GetAsync(new Uri(baseAddress + url2)).Wait(), 2);
-                repeat(() => httpClient.PostAsync(new Uri(baseAddress + url3), new StringContent(url3)).Wait(), 3);
-                repeat(() => httpClient.PutAsync(new Uri(baseAddress + url4), new StringContent(url4)).Wait(), 4);
+                await httpClient.DeleteAsync(baseAddress + url1);
+                await Repeat(() => httpClient.GetAsync(baseAddress + url2), 2);
+                await Repeat(() => httpClient.PostAsync(baseAddress + url3, new StringContent(url3)), 3);
+                await Repeat(() => httpClient.PutAsync(baseAddress + url4, new StringContent(url4)), 4);
 
                 fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == url1).Should().Be(1);
                 fakeServer.CapturedRequests.Count(x => x.Method == Http.Get && x.Url == url2).Should().Be(2);
@@ -378,5 +377,12 @@ namespace JustFakeIt.Tests
             }
         }
 
+        private async Task Repeat(Func<Task> a, int times)
+        {
+            for (var i = 0; i < times; i++)
+            {
+                await a();
+            }
+        }
     }
 }
