@@ -347,6 +347,26 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
+        public void FakeServer_ShouldExecuteResponseExpectationCallback_ReturnExpectedData()
+        {
+            const string expectedResult = "Some String Data";
+            const string baseAddress = "http://localhost:12354";
+
+            const string url = "/some-url?id=1234";
+
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.Get(url).Callback(() => new HttpResponseExpectation(HttpStatusCode.OK, expectedResult));
+
+                fakeServer.Start();
+
+                var result = new WebClient().DownloadString(new Uri(baseAddress + url));
+
+                result.Should().Be(expectedResult);
+            }
+        }
+
+        [Fact]
         public void FakeServer_CapturesAllRequests()
         {
             using (var fakeServer = new FakeServer())
@@ -377,6 +397,5 @@ namespace JustFakeIt.Tests
                 fakeServer.CapturedRequests.Count(x => x.Method == Http.Put && x.Url == url4 && x.Body == url4).Should().Be(4);
             }
         }
-
     }
 }

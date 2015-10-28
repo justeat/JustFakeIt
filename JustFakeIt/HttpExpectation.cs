@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Newtonsoft.Json;
 
 namespace JustFakeIt
@@ -7,6 +8,7 @@ namespace JustFakeIt
     {
         public HttpRequestExpectation Request { get; set; }
         public HttpResponseExpectation Response { get; set; }
+        public Func<HttpResponseExpectation> ResponseExpectationCallback { get; private set; }
 
         public void Returns(string expectedResult, WebHeaderCollection expectedHeaders = null)
         {
@@ -26,6 +28,11 @@ namespace JustFakeIt
         public void Returns(HttpStatusCode expectedStatusCode, object expectedResult, WebHeaderCollection expectedHeaders = null)
         {
             Returns(expectedStatusCode, JsonConvert.SerializeObject(expectedResult), expectedHeaders);
+        }
+
+        public void Callback(Func<HttpResponseExpectation> responseExpectationFunc)
+        {
+            ResponseExpectationCallback = responseExpectationFunc;
         }
     }
 }

@@ -68,15 +68,31 @@ namespace JustFakeIt
 
         private Task ProcessMatchingExpectation(IOwinResponse response, HttpExpectation httpExpectation)
         {
-            foreach (var key in httpExpectation.Response.Headers.AllKeys)
-                response.Headers.Add(key, new[] { httpExpectation.Response.Headers[key] });
+            var httpResponseExpectation = httpExpectation.Response;
+            if (httpExpectation.ResponseExpectationCallback != null)
+            {
+                httpResponseExpectation = httpExpectation.ResponseExpectationCallback.Invoke();
+            }
 
-            response.Headers.Add("Content-Type", new[] { "application/json" });
-            response.StatusCode = (int)httpExpectation.Response.StatusCode;
+            var expectedResults = string.Empty;
+            if (httpResponseExpectation != null)
+            {
+                response.StatusCode = (int)httpResponseExpectation.StatusCode;
+                expectedResults = httpResponseExpectation.ExpectedResult;
+
+                if (httpResponseExpectation.Headers != null)
+                {
+                    foreach (var key in httpResponseExpectation.Headers.AllKeys)
+                        response.Headers.Add(key, new[] {httpResponseExpectation.Headers[key]});
+                }
+            }
+
+            if (response.Headers != null)
+                response.Headers.Add("Content-Type", new[] {"application/json"});
 
             Task.Delay(_expect.ResponseTime).Wait();
 
-            return response.WriteAsync(httpExpectation.Response.ExpectedResult);
+            return response.WriteAsync(expectedResults);
         }
     }
 }
