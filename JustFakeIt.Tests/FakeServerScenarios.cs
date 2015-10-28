@@ -321,6 +321,30 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
+        public void FakeServer_ShouldHandleMultipleRegistrationOnSameEndPoint_WithDifferentBodies_ReturnExpectedData()
+        {
+            var expectedResultA = "1234";
+            var expectedResultB = "5678";
+
+            const string baseAddress = "http://localhost:12354";
+            const string fakeurl = "/some-url";
+
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.Post(fakeurl, "messageA").Returns(HttpStatusCode.OK, expectedResultA);
+                fakeServer.Expect.Post(fakeurl, "messageB").Returns(HttpStatusCode.OK, expectedResultB);
+
+                fakeServer.Start();
+
+                var resultA = new WebClient().UploadString(new Uri(baseAddress + fakeurl), "POST", "messageA");
+                var resultB = new WebClient().UploadString(new Uri(baseAddress + fakeurl), "POST", "messageB");
+
+                resultA.Should().Be(expectedResultA);
+                resultB.Should().Be(expectedResultB);
+            }
+        }
+
+        [Fact]
         public void FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
         {
             var expectedResult = new { ResourceId = 1234 };

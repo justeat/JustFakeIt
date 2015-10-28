@@ -30,7 +30,7 @@ namespace JustFakeIt
             Debug.WriteLine("\t\t\tBody:\t\t\t" + body);
             
             var matchingExpectation = 
-                _expect.Expectations.FirstOrDefault(e => RequestAndExpectedHttpMethodAndPathsMatch(context, e.Request));
+                _expect.Expectations.FirstOrDefault(e => RequestAndExpectedHttpMethodAndPathsMatch(context, e.Request, body));
 
             if (matchingExpectation == null)
             {
@@ -58,12 +58,12 @@ namespace JustFakeIt
             return body;
         }
 
-        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation)
+        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation, string actualBody)
         {
             return
                 requestExpectation.MatchesActualPath(context.Request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)) &&
                 requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
-                requestExpectation.MatchesActualBody(context.Request.Body);
+                requestExpectation.MatchesActualBody(actualBody);
         }
 
         private Task ProcessMatchingExpectation(IOwinResponse response, HttpExpectation httpExpectation)
