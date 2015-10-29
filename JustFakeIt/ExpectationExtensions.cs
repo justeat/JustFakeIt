@@ -51,16 +51,9 @@ namespace JustFakeIt
             return actualHttpMethod.Equals(expected.Method.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool MatchesActualBody(this HttpRequestExpectation expected, Stream actualBody)
+        public static bool MatchesActualBody(this HttpRequestExpectation expected, string actualBody)
         {
-            string stringBody;
-
-            using (var sr = new StreamReader(actualBody))
-            {
-                stringBody = sr.ReadToEnd();
-            }
-
-            return string.IsNullOrEmpty(expected.Body) || stringBody.Equals(expected.Body);
+            return string.IsNullOrEmpty(expected.Body) || actualBody.Equals(expected.Body);
         }
     }
 }
