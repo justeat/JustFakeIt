@@ -19,7 +19,10 @@ namespace JustFakeIt
 
         private static bool IsAvailable(int port)
         {
-            if (port == 0) return false;
+            if (port == 0)
+            {
+                return false;
+            }
 
             var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
             var allActiveTcpConnections = ipGlobalProperties.GetActiveTcpConnections();
