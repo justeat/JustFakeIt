@@ -45,7 +45,10 @@ namespace JustFakeIt
         {
             string body;
             using (var sr = new StreamReader(request.Body))
+            {
                 body = sr.ReadToEnd();
+            }
+
             request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
 
             if (_capturedRequests != null)
