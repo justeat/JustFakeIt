@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin;
@@ -38,6 +39,14 @@ namespace JustFakeIt
                 return context.Response.WriteAsync(new byte[0]);
             }
 
+            var missingRequestHeaders = MissingRequestHeaders(context.Request.Headers, matchingExpectation.Request.Headers);
+
+            if (!string.IsNullOrWhiteSpace(missingRequestHeaders))
+            {
+                context.Response.StatusCode = 400;
+                return context.Response.WriteAsync(missingRequestHeaders);
+            }
+
             return ProcessMatchingExpectation(context.Response, matchingExpectation);
         }
 
@@ -67,6 +76,32 @@ namespace JustFakeIt
                 requestExpectation.MatchesActualPath(context.Request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)) &&
                 requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
                 requestExpectation.MatchesActualBody(actualBody);
+        }
+
+        private string MissingRequestHeaders(IHeaderDictionary headers, WebHeaderCollection expectedRequestHeaders)
+        {
+            if (expectedRequestHeaders == null)
+            {
+                return "";
+            }
+
+            var errors = new StringBuilder();
+            foreach (var key in expectedRequestHeaders.AllKeys)
+            {
+                if (headers.ContainsKey(key))
+                {
+                    if (headers[key] != expectedRequestHeaders[key])
+                    {
+                        errors.AppendFormat("{0} header value not as expected.\r\n\tExpected: {1}\r\n\tProvided: {2}\r\n", key, expectedRequestHeaders[key], headers[key]);
+                    }
+                }
+                else
+                {
+                    errors.AppendFormat("{0} header was not provided.\r\n", key);
+                }
+            }
+
+            return errors.ToString();
         }
 
         private Task ProcessMatchingExpectation(IOwinResponse response, HttpExpectation httpExpectation)

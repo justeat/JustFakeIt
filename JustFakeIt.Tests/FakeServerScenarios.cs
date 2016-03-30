@@ -33,7 +33,7 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
-        public async Task FakeServer_ExpectGetWithHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
+        public async Task FakeServer_ExpectGetWithResponseHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
         {
             const string expectedResult = "Some String Data";
 
@@ -53,6 +53,79 @@ namespace JustFakeIt.Tests
 
                 result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
                 result.Headers.Should().ContainSingle(x => x.Key == "foo");
+            }
+        }
+
+        [Fact]
+        public async Task FakeServer_ExpectGetWithRequestHeadersSpecified_WhenRequestHeadersProvided_ResponseMatchesExpection()
+        {
+            const string expectedResult = "Some String Data";
+
+            var port = Ports.GetFreeTcpPort();
+
+            var baseAddress = "http://localhost:" + port;
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(port))
+            {
+                var expectedRequestHeaders = new WebHeaderCollection
+                {
+                    {"X-Dummy1", "dummy1val"},
+                    {"X-Dummy2", "dummy2val"},
+                    {"X-Dummy3", "dummy3val"}
+                };
+
+                fakeServer.Expect.Get(url, expectedRequestHeaders).Returns(expectedResult);
+                fakeServer.Start();
+
+                var client = new HttpClient { BaseAddress = new Uri(baseAddress) };
+
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.TryAddWithoutValidation("X-Dummy1", "dummy1val");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("X-Dummy2", "dummy2val");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("X-Dummy3", "dummy3val");
+
+                var result = await client.GetAsync(url);
+
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
+                result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
+            }
+        }
+
+        [Fact]
+        public async Task FakeServer_ExpectGetWithRequestHeadersSpecified_WhenRequestHeadersNotProvided_ResponseIsBadRequest()
+        {
+            const string expectedResult = "X-Dummy1 header value not as expected.\r\n\tExpected: dummy1val\r\n\tProvided: other1val\r\nX-Dummy2 header was not provided.\r\n";
+
+            var port = Ports.GetFreeTcpPort();
+
+            var baseAddress = "http://localhost:" + port;
+
+            const string url = "/some-url";
+
+            using (var fakeServer = new FakeServer(port))
+            {
+                var expectedRequestHeaders = new WebHeaderCollection
+                {
+                    {"X-Dummy1", "dummy1val"},  // will have different value
+                    {"X-Dummy2", "dummy2val"},  // will be missing
+                    {"X-Dummy3", "dummy3val"}   // will match
+                };
+
+                fakeServer.Expect.Get(url, expectedRequestHeaders).Returns(expectedResult);
+                fakeServer.Start();
+
+                var client = new HttpClient { BaseAddress = new Uri(baseAddress) };
+
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.TryAddWithoutValidation("X-Dummy1", "other1val");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("X-Dummy3", "dummy3val");
+
+                var result = await client.GetAsync(url);
+
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
             }
         }
 
