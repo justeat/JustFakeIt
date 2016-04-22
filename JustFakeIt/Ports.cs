@@ -8,6 +8,8 @@ namespace JustFakeIt
     {
         private static readonly Random Random = new Random();
 
+        public static readonly object FreePortCreationLock = new object();
+
         public static int GetFreeTcpPort()
         {
             var port = 0;

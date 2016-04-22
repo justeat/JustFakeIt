@@ -9,30 +9,58 @@ namespace JustFakeIt
 {
     public class FakeServer : IDisposable
     {
-        public Uri BaseUri { get; private set; }
-        public Expect Expect { get; protected set; }
+        private const int Retries = 5;
 
-        public IReadOnlyList<HttpRequestExpectation> CapturedRequests
+        private static readonly object ListeningCreationLock = new object();
+
+        private Uri GetBaseUri()
         {
-            get { return _capturedRequests.ToArray(); }
+            var port = _basePort ?? Ports.GetFreeTcpPort();
+            return new UriBuilder(Uri.UriSchemeHttp, "127.0.0.1", port).Uri;
         }
 
         private IDisposable _webApp;
         private readonly IList<HttpRequestExpectation> _capturedRequests;
+        private int? _basePort;
 
-        public FakeServer() : this(Ports.GetFreeTcpPort())
+        public Expect Expect { get; protected set; }
+
+        public IReadOnlyList<HttpRequestExpectation> CapturedRequests => _capturedRequests.ToArray();
+
+        public Uri BaseUri
         {
+            get
+            {
+                if (_basePort.HasValue) return GetBaseUri();
+                throw new InvalidOperationException("Cannot give you the base URL before server has started");
+            }
         }
 
-        public FakeServer(int basePort)
+        public FakeServer()
         {
-            BaseUri = new UriBuilder(Uri.UriSchemeHttp, "127.0.0.1", basePort).Uri;
             Expect = new Expect();
             _capturedRequests = new List<HttpRequestExpectation>();
         }
 
+        public FakeServer(int basePort) : this()
+        {
+            _basePort = basePort;
+        }
+
+        public void Start()
+        {
+            _basePort = Retry(Retries, () => DoWithLock(StartAndReturnPort));
+        }
+
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
             if (_webApp != null)
             {
                 _webApp.Dispose();
@@ -48,9 +76,36 @@ namespace JustFakeIt
             hostingTraceListeners.ForEach(x => Trace.Listeners.Remove(x));
         }
 
-        public void Start()
+        private T DoWithLock<T>(Func<T> action)
         {
-            _webApp = WebApp.Start(BaseUri.ToString(), app => app.Use<ProxyMiddleware>(Expect, _capturedRequests));
+            lock (ListeningCreationLock)
+            {
+                return action();
+            }
+        }
+
+        private T Retry<T>(int times, Func<T> action)
+        {
+            Exception exception = null;
+            for (var i = 0; i < times; i++)
+            {
+                try
+                {
+                    return action();
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+            }
+            throw exception ?? new InvalidOperationException("Something went horribly wrong");
+        }
+
+        private int StartAndReturnPort()
+        {
+            var uri = GetBaseUri();
+            _webApp = WebApp.Start(uri.ToString(), app => app.Use<ProxyMiddleware>(Expect, _capturedRequests));
+            return uri.Port;
         }
     }
 }
