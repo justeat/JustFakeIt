@@ -1,42 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
 
 namespace JustFakeIt
 {
-    public class ProxyMiddleware :  OwinMiddleware
+    public class ProxyMiddleware
     {
-        private readonly Expect _expect;
-        private readonly IList<HttpRequestExpectation> _capturedRequests;
+        private readonly RequestDelegate next;
+        private readonly Expect expect;
+        private readonly IList<HttpRequestExpectation> capturedRequests;
 
-        public ProxyMiddleware(OwinMiddleware next, Expect expect, IList<HttpRequestExpectation> capturedRequests = null) : base(next)
+        public ProxyMiddleware(RequestDelegate next, Expect expect, IList<HttpRequestExpectation> capturedRequests = null)
         {
-            _expect = expect;
-            _capturedRequests = capturedRequests;
+            this.next = next;
+            this.expect = expect;
+            this.capturedRequests = capturedRequests;
         }
 
-        public override Task Invoke(IOwinContext context)
+        public async Task Invoke(HttpContext context)
         {
+            await next(context);
+
             var body = CaptureRequest(context.Request);
 
-            Debug.WriteLine("Looking for registration that matches: ");
-            Debug.WriteLine("\t\t\tPath:\t\t\t" + context.Request.Uri.PathAndQuery);
-            Debug.WriteLine("\t\t\tMethod:\t\t\t" + context.Request.Method);
-            Debug.WriteLine("\t\t\tBody:\t\t\t" + body);
-            
             var matchingExpectation = 
-                _expect.Expectations.FirstOrDefault(e => RequestAndExpectedHttpMethodAndPathsMatch(context, e.Request, body));
+                expect.Expectations.FirstOrDefault(e => RequestAndExpectedHttpMethodAndPathsMatch(context, e.Request, body));
 
             if (matchingExpectation == null)
             {
                 context.Response.StatusCode = 404;
-                return context.Response.WriteAsync(new byte[0]);
+                await context.Response.WriteAsync(string.Empty);
+                return;
             }
 
             var missingRequestHeaders = MissingRequestHeaders(context.Request.Headers, matchingExpectation.Request.Headers);
@@ -44,36 +43,36 @@ namespace JustFakeIt
             if (!string.IsNullOrWhiteSpace(missingRequestHeaders))
             {
                 context.Response.StatusCode = 400;
-                return context.Response.WriteAsync(missingRequestHeaders);
+                await context.Response.WriteAsync(missingRequestHeaders);
+                return;
             }
 
-            return ProcessMatchingExpectation(context.Response, matchingExpectation);
+            ProcessMatchingExpectation(context.Response, matchingExpectation);
         }
 
-        private string CaptureRequest(IOwinRequest request)
+        private string CaptureRequest(HttpRequest request)
         {
             string body;
+            
             using (var sr = new StreamReader(request.Body))
             {
                 body = sr.ReadToEnd();
             }
 
-            request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
-
-            if (_capturedRequests != null)
+            if (capturedRequests != null)
             {
                 var method = (Http)Enum.Parse(typeof(Http), request.Method, true);
-                var url = request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
-                _capturedRequests.Add(new HttpRequestExpectation(method, url, body));
+                var url = request.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                capturedRequests.Add(new HttpRequestExpectation(method, url, body));
             }
 
             return body;
         }
 
-        private static bool RequestAndExpectedHttpMethodAndPathsMatch(IOwinContext context, HttpRequestExpectation requestExpectation, string actualBody)
+        private static bool RequestAndExpectedHttpMethodAndPathsMatch(HttpContext context, HttpRequestExpectation requestExpectation, string actualBody)
         {
             return
-                requestExpectation.MatchesActualPath(context.Request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)) &&
+                requestExpectation.MatchesActualPath(context.Request.GetUri().PathAndQuery) &&
                 requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
                 requestExpectation.MatchesActualBody(actualBody);
         }
@@ -104,7 +103,7 @@ namespace JustFakeIt
             return errors.ToString();
         }
 
-        private Task ProcessMatchingExpectation(IOwinResponse response, HttpExpectation httpExpectation)
+        private void ProcessMatchingExpectation(HttpResponse response, HttpExpectation httpExpectation)
         {
             var httpResponseExpectation = httpExpectation.Response;
             if (httpExpectation.ResponseExpectationCallback != null)
@@ -125,12 +124,11 @@ namespace JustFakeIt
                 }
             }
 
-            if (response.Headers != null)
-                response.Headers.Add("Content-Type", new[] {"application/json"});
+            response.Headers?.Add("Content-Type", new[] {"application/json"});
 
-            Task.Delay(_expect.ResponseTime).Wait();
+            Task.Delay(expect.ResponseTime).Wait();
 
-            return response.WriteAsync(expectedResults);
+            response.WriteAsync(expectedResults);
         }
     }
 }

@@ -2,23 +2,19 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Owin.Hosting;
-using Owin;
+using Microsoft.AspNetCore.Hosting;
 
 namespace JustFakeIt
 {
     public class FakeServer : IDisposable
     {
-        public Uri BaseUri { get; private set; }
+        public Uri BaseUri { get; }
         public Expect Expect { get; protected set; }
 
-        public IReadOnlyList<HttpRequestExpectation> CapturedRequests
-        {
-            get { return _capturedRequests.ToArray(); }
-        }
+        public IReadOnlyList<HttpRequestExpectation> CapturedRequests => capturedRequests.ToArray();
 
-        private IDisposable _webApp;
-        private readonly IList<HttpRequestExpectation> _capturedRequests;
+        private IDisposable webApp;
+        private readonly IList<HttpRequestExpectation> capturedRequests;
 
         public FakeServer() : this(Ports.GetFreeTcpPort())
         {
@@ -26,17 +22,17 @@ namespace JustFakeIt
 
         public FakeServer(int basePort)
         {
-            BaseUri = new UriBuilder(Uri.UriSchemeHttp, "127.0.0.1", basePort).Uri;
+            BaseUri = new UriBuilder("http", "127.0.0.1", basePort, string.Empty).Uri;
             Expect = new Expect();
-            _capturedRequests = new List<HttpRequestExpectation>();
+            capturedRequests = new List<HttpRequestExpectation>();
         }
 
         public void Dispose()
         {
-            if (_webApp != null)
+            if (webApp != null)
             {
-                _webApp.Dispose();
-                _webApp = null;
+                webApp.Dispose();
+                webApp = null;
             }
             
             // Owin Hosting adds trace listeners to the Trace
@@ -50,7 +46,15 @@ namespace JustFakeIt
 
         public void Start()
         {
-            _webApp = WebApp.Start(BaseUri.ToString(), app => app.Use<ProxyMiddleware>(Expect, _capturedRequests));
+            var host = new WebHostBuilder()
+                .UseUrls(BaseUri.AbsoluteUri)
+                .Configure(app => app.UseProxyMiddleware(Expect, capturedRequests))
+                .UseKestrel()
+                .Build();
+
+            webApp = host;
+
+            host.Start();
         }
     }
 }

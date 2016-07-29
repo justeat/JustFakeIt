@@ -1,15 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustFakeIt", "JustFakeIt\JustFakeIt.csproj", "{D3DA166D-C5B3-4AAC-93F8-45D108DAB681}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "JustFakeIt", "JustFakeIt\JustFakeIt.xproj", "{3624EC0E-0B8F-4EA5-AAAC-876DB3820BFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustFakeIt.Tests", "JustFakeIt.Tests\JustFakeIt.Tests.csproj", "{97FCFD12-5BAB-4605-9516-B3016521DE65}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "JustFakeIt.Tests", "JustFakeIt.Tests\JustFakeIt.Tests.xproj", "{87950069-E700-482C-8733-9DCD82B9F550}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7C13161F-0E55-4789-A1CA-3EB229008050}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{33829F80-99C2-4CA0-8A38-F6C45E3F6396}"
 	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{B58E4C56-4ED6-4147-98D5-86D062A1748C}"
+	ProjectSection(SolutionItems) = preProject
+		AUTHORS.txt = AUTHORS.txt
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE.md = LICENSE.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
@@ -18,14 +28,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D3DA166D-C5B3-4AAC-93F8-45D108DAB681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3DA166D-C5B3-4AAC-93F8-45D108DAB681}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3DA166D-C5B3-4AAC-93F8-45D108DAB681}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3DA166D-C5B3-4AAC-93F8-45D108DAB681}.Release|Any CPU.Build.0 = Release|Any CPU
-		{97FCFD12-5BAB-4605-9516-B3016521DE65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97FCFD12-5BAB-4605-9516-B3016521DE65}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97FCFD12-5BAB-4605-9516-B3016521DE65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97FCFD12-5BAB-4605-9516-B3016521DE65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3624EC0E-0B8F-4EA5-AAAC-876DB3820BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3624EC0E-0B8F-4EA5-AAAC-876DB3820BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3624EC0E-0B8F-4EA5-AAAC-876DB3820BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3624EC0E-0B8F-4EA5-AAAC-876DB3820BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87950069-E700-482C-8733-9DCD82B9F550}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87950069-E700-482C-8733-9DCD82B9F550}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87950069-E700-482C-8733-9DCD82B9F550}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87950069-E700-482C-8733-9DCD82B9F550}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

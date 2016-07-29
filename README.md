@@ -21,7 +21,7 @@ It will configure itself as a default proxy and let you hook any WebRequest base
 
 ## Installation
 
-Pre-requisites: The project is built in .net v4.0.
+Pre-requisites: The project is built in .netstandard 1.3, which means it supports .NET Framework 4.6 onwards and .NET Core.
 
 * From source: https://github.com/justeat/JustFakeIt
 * By hand: https://www.nuget.org/packages/JustFakeIt
@@ -35,7 +35,7 @@ Via NuGet:
 
 Once you have the package installed into your test project, a standard wire-up will look like this.
 
-```
+```csharp
 [Fact]
 public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
 {    
@@ -44,7 +44,7 @@ public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
         fakeServer.Expect.Get("/123").Returns("Some String Data");
         fakeServer.Start();
 
-        var result = new WebClient().DownloadString(new Uri("http://www.anything-at-all.com/123"));
+        var result = new HttpClient().GetStringAsync(new Uri("http://www.anything-at-all.com/123")).Result;
 
         result.Should().Be("Some String Data");
     }
@@ -53,21 +53,21 @@ public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
 
 Ignore parameters by replacing the value with "{ignore}"
 
-```
- var fakeurl = "/some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
- fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
+```csharp
+var fakeurl = "/some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
+fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
 ```
 
 Set a response time by setting the ResponseTime property
 
-```
- fakeServer.Expect.ResponseTime = TimeSpan.FromSeconds(5);
+```csharp
+fakeServer.Expect.ResponseTime = TimeSpan.FromSeconds(5);
 ```
 
 Assert against captured requests
 
-```
- fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == "/some-url").Should().Be(1);
+```csharp
+fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == "/some-url").Should().Be(1);
 ```
 
 ## Contributing

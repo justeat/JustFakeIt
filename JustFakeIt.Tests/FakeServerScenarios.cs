@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ namespace JustFakeIt.Tests
     public class FakeServerScenarios
     {
         [Fact]
-        public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
+        public async Task FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
 
@@ -25,8 +24,8 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
                 
                 var baseAddress = fakeServer.BaseUri;
-                var uri = new Uri(baseAddress + url);
-                var result = new WebClient().DownloadString(uri);
+                var uri = new Uri(baseAddress, url);
+                var result = await new HttpClient().GetStringAsync(uri);
 
                 result.Should().Be(expectedResult);
             }
@@ -45,7 +44,12 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer(port))
             {
-                fakeServer.Expect.Get(url).Returns(expectedResult, new WebHeaderCollection { { "foo", "bar" } });
+                var expectedRequestHeaders = new WebHeaderCollection
+                {
+                    ["foo"] = "bar"
+                };
+
+                fakeServer.Expect.Get(url).Returns(expectedResult, expectedRequestHeaders);
                 fakeServer.Start();
 
                 var client = new HttpClient {BaseAddress = new Uri(baseAddress)};
@@ -71,9 +75,9 @@ namespace JustFakeIt.Tests
             {
                 var expectedRequestHeaders = new WebHeaderCollection
                 {
-                    {"X-Dummy1", "dummy1val"},
-                    {"X-Dummy2", "dummy2val"},
-                    {"X-Dummy3", "dummy3val"}
+                    ["X-Dummy1"] = "dummy1val",
+                    ["X-Dummy2"] = "dummy2val",
+                    ["X-Dummy3"] = "dummy3val"
                 };
 
                 fakeServer.Expect.Get(url, expectedRequestHeaders).Returns(expectedResult);
@@ -108,9 +112,9 @@ namespace JustFakeIt.Tests
             {
                 var expectedRequestHeaders = new WebHeaderCollection
                 {
-                    {"X-Dummy1", "dummy1val"},  // will have different value
-                    {"X-Dummy2", "dummy2val"},  // will be missing
-                    {"X-Dummy3", "dummy3val"}   // will match
+                    ["X-Dummy1"] = "dummy1val",  // will have different value
+                    ["X-Dummy2"] = "dummy2val",  // will be missing
+                    ["X-Dummy3"] = "dummy3val"   // will match
                 };
 
                 fakeServer.Expect.Get(url, expectedRequestHeaders).Returns(expectedResult);
@@ -144,7 +148,7 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + url);
-                var result = new WebClient().DownloadString(uri);
+                var result = new HttpClient().GetStringAsync(uri).Result;
 
                 result.Should().Be(expectedResult);
             }
@@ -165,7 +169,7 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + url);
-                var stringResult = new WebClient().DownloadString(uri);
+                var stringResult = new HttpClient().GetStringAsync(uri).Result;
                 var result = JsonConvert.DeserializeObject<dynamic>(stringResult);
 
                 Assert.Equal(expectedResult.RestaurantId, (int)result.RestaurantId);
@@ -187,7 +191,12 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + url);
-                var result = new WebClient().UploadString(uri, string.Empty);
+                var result = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Post, uri) { Content = new StringContent(string.Empty) })
+                    .Result
+                    .Content
+                    .ReadAsStringAsync()
+                    .Result;
 
                 result.Should().Be(expectedResult);
             }
@@ -208,9 +217,11 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + url);
-                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(uri, string.Empty));
+                var response = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(string.Empty)})
+                    .Result;
 
-                ((HttpWebResponse)ex.Response).StatusCode.Should().Be(HttpStatusCode.NotFound);
+                response.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }
 
@@ -227,9 +238,9 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + "/home");
-                var ex = Assert.Throws<WebException>(() => new WebClient().DownloadString(uri));
+                var response = new HttpClient().GetAsync(uri).Result;
 
-                ((HttpWebResponse)ex.Response).StatusCode.Should().Be(HttpStatusCode.NotFound);
+                response.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }
 
@@ -247,9 +258,11 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + path);
-                var ex = Assert.Throws<WebException>(() => new WebClient().UploadString(uri, string.Empty));
+                var response = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Post, uri) { Content = new StringContent(string.Empty) })
+                    .Result;
 
-                ((HttpWebResponse)ex.Response).StatusCode.Should().Be(HttpStatusCode.NotFound);
+                response.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }
 
@@ -268,7 +281,12 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + url);
-                var result = new WebClient().UploadString(uri, "PUT", string.Empty);
+                var result = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Put, uri) { Content = new StringContent(string.Empty) })
+                    .Result
+                    .Content
+                    .ReadAsStringAsync()
+                    .Result;
 
                 result.Should().Be(expectedResult);
             }
@@ -288,7 +306,15 @@ namespace JustFakeIt.Tests
                 fakeServer.Start();
 
                 var uri = new Uri(baseAddress + url);
-                var result = new WebClient().UploadString(uri, "DELETE", string.Empty);
+                var result = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Delete, uri)
+                    {
+                        Content = new StringContent(string.Empty)
+                    })
+                    .Result
+                    .Content
+                    .ReadAsStringAsync()
+                    .Result;
 
                 result.Should().Be(expectedResult);
             }
@@ -413,8 +439,25 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var resultA = new WebClient().UploadString(new Uri(baseAddress + fakeurl), "POST", "messageA");
-                var resultB = new WebClient().UploadString(new Uri(baseAddress + fakeurl), "POST", "messageB");
+                var resultA = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Post, new Uri(baseAddress + fakeurl))
+                    {
+                        Content = new StringContent("messageA")
+                    })
+                    .Result
+                    .Content
+                    .ReadAsStringAsync()
+                    .Result;
+
+                var resultB = new HttpClient()
+                    .SendAsync(new HttpRequestMessage(HttpMethod.Post, new Uri(baseAddress + fakeurl))
+                    {
+                        Content = new StringContent("messageB")
+                    })
+                    .Result
+                    .Content
+                    .ReadAsStringAsync()
+                    .Result;
 
                 resultA.Should().Be(expectedResultA);
                 resultB.Should().Be(expectedResultB);
@@ -461,7 +504,7 @@ namespace JustFakeIt.Tests
 
                 fakeServer.Start();
 
-                var result = new WebClient().DownloadString(new Uri(baseAddress + url));
+                var result = new HttpClient().GetStringAsync(new Uri(baseAddress + url)).Result;
 
                 result.Should().Be(expectedResult);
             }
@@ -481,10 +524,10 @@ namespace JustFakeIt.Tests
                 var url4 = "/request4";
 
                 var httpClient = new HttpClient();
-                await httpClient.DeleteAsync(baseAddress + url1);
-                await Repeat(() => httpClient.GetAsync(baseAddress + url2), 2);
-                await Repeat(() => httpClient.PostAsync(baseAddress + url3, new StringContent(url3)), 3);
-                await Repeat(() => httpClient.PutAsync(baseAddress + url4, new StringContent(url4)), 4);
+                await httpClient.DeleteAsync(new Uri(baseAddress, url1));
+                await Repeat(() => httpClient.GetAsync(new Uri(baseAddress, url2)), 2);
+                await Repeat(() => httpClient.PostAsync(new Uri(baseAddress, url3), new StringContent(url3)), 3);
+                await Repeat(() => httpClient.PutAsync(new Uri(baseAddress, url4), new StringContent(url4)), 4);
 
                 fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == url1).Should().Be(1);
                 fakeServer.CapturedRequests.Count(x => x.Method == Http.Get && x.Url == url2).Should().Be(2);

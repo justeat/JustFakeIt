@@ -1,0 +1,39 @@
+version: 1.0.{build}-{branch}
+
+init:
+  - git config --global core.autocrlf input
+
+before_build:
+  - dotnet --info
+  - dotnet restore --no-cache
+
+configuration:
+  - debug
+  - release
+
+
+build_script:
+  - dotnet pack JustFakeIt\project.json --configuration %configuration%
+
+test_script:
+  - dotnet test JustFakeIt.Tests\project.json --configuration %configuration% --framework net451
+
+# -- TODO: deploy on tag creation
+#deploy:
+#  - provider: NuGet
+#    api_key: 
+#      secure: -- todo --
+#    on:
+#      branch: master
+#      appveyor_repo_tag: true
+#      configuration: release
+#    skip_symbols: true
+#    artifact: nuget_packages
+
+#nuget:
+#  project_feed: true
+#  disable_publish_on_pr: true
+
+artifacts:
+  - path: JustFakeIt\bin\$(configuration)\*.nupkg
+    name: JustFakeItPackages
