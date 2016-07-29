@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace JustFakeIt
 {
-    public class ProxyMiddleware
+    internal class ProxyMiddleware
     {
         private readonly RequestDelegate next;
         private readonly Expect expect;
