@@ -16,7 +16,7 @@ build_script:
   - dotnet pack JustFakeIt\project.json --configuration %configuration%
 
 test_script:
-  - dotnet test JustFakeIt.Tests\project.json --configuration %configuration% --framework net451
+  - dotnet test JustFakeIt.Tests\project.json --configuration %configuration% --framework netcoreapp10
 
 # -- TODO: deploy on tag creation
 #deploy:
