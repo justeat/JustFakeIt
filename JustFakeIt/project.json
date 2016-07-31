@@ -38,7 +38,6 @@
                 "NETStandard.Library": "1.6.0",
                 "Newtonsoft.Json": "9.0.1",
                 "System.Collections.Specialized": "4.0.1",
-                "System.Diagnostics.TraceSource": "4.0.0",
                 "System.Linq": "4.1.0",
                 "System.Net.NetworkInformation": "4.1.0",
                 "System.Net.WebHeaderCollection": "4.0.1"

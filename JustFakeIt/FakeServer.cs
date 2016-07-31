@@ -34,14 +34,6 @@ namespace JustFakeIt
                 webApp.Dispose();
                 webApp = null;
             }
-            
-            // Owin Hosting adds trace listeners to the Trace
-            // just removing them here to keep the environment clean
-            var hostingTraceListeners = Trace.Listeners.Cast<TraceListener>()
-                .Where(listener => listener.Name == "HostingTraceListener")
-                .ToList();
-
-            hostingTraceListeners.ForEach(x => Trace.Listeners.Remove(x));
         }
 
         public void Start()
