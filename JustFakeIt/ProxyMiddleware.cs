@@ -128,9 +128,12 @@ namespace JustFakeIt
             if (response.Headers != null)
                 response.Headers.Add("Content-Type", new[] {"application/json"});
 
-            Task.Delay(_expect.ResponseTime).Wait();
-
+            if (httpResponseExpectation.ResponseTime != TimeSpan.Zero)
+                Task.Delay(httpResponseExpectation.ResponseTime).Wait();
+            else
+                Task.Delay(_expect.ResponseTime).Wait();
             return response.WriteAsync(expectedResults);
         }
+
     }
 }

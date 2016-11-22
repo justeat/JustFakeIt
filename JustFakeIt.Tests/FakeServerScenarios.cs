@@ -448,7 +448,26 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
-        public void FakeServer_ShouldExecuteResponseExpectationCallback_ReturnExpectedData()
+        public async Task FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
+        {
+            var expectedResult = new { ResourceId = 1234 };
+            var expectedResponseTime = TimeSpan.FromSeconds(1);
+
+            using (var fakeServer = new FakeServer())
+            {
+                fakeServer.Expect.ResponseTime = expectedResponseTime;
+                fakeServer.Expect.Get("/some-url").Returns(expectedResult).RespondsIn(TimeSpan.FromSeconds(5)).WithHttpStatus(HttpStatusCode.OK);
+                fakeServer.Start();
+
+                var stopwatch = Stopwatch.StartNew();
+
+                await fakeServer.Client.GetAsync("/some-url");
+
+                stopwatch.Stop();
+
+                stopwatch.Elapsed.Should().BeGreaterOrEqualTo(expectedResponseTime);
+            }
+        }
         {
             const string expectedResult = "Some String Data";
             const string baseAddress = "http://localhost:12354";

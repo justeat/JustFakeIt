@@ -33,6 +33,11 @@ namespace JustFakeIt
         public void Callback(Func<HttpResponseExpectation> responseExpectationFunc)
         {
             ResponseExpectationCallback = responseExpectationFunc;
+
+        public HttpExpectation RespondsIn(TimeSpan time)
+        {
+            Response.ResponseTime = time;
+            return this;
         }
     }
 }
