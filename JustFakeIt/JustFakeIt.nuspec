@@ -15,6 +15,7 @@
         <dependencies>
             <dependency id="Microsoft.Owin.SelfHost" version="3.0.1" />
             <dependency id="Newtonsoft.Json" version="7.0.1" />
+            <dependency id="RazorEngine" version="3.9.1" />
         </dependencies>
     </metadata>
     <files>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.Net;
 
 namespace JustFakeIt
@@ -8,6 +9,7 @@ namespace JustFakeIt
         public HttpStatusCode StatusCode { get; set; }
         public string ExpectedResult { get; set; }
         public WebHeaderCollection Headers { get; set; }
+        public TimeSpan ResponseTime { get; set; }
 
         public HttpResponseExpectation(HttpStatusCode expectedStatusCode, string expectedResult, NameValueCollection headers = null)
         {
