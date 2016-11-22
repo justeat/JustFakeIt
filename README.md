@@ -35,7 +35,7 @@ Via NuGet:
 
 Once you have the package installed into your test project, a standard wire-up will look like this.
 
-```
+```csharp
 [Fact]
 public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
 {    
@@ -53,22 +53,42 @@ public void FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
 
 Ignore parameters by replacing the value with "{ignore}"
 
-```
+```csharp
  var fakeurl = "/some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
  fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult);
 ```
 
-Set a response time by setting the ResponseTime property
+Set a response time accross all endpoints by setting the `ResponseTime` property
 
-```
+```csharp
  fakeServer.Expect.ResponseTime = TimeSpan.FromSeconds(5);
 ```
 
+Set the response time for a specific endpoint with `RespondsIn()`
+
+```csharp
+ fakeServer.Expect.Get(fakeurl).Returns(HttpStatusCode.Accepted, expectedResult).RespondsIn(TimeSpan.FromSeconds(5));
+```
 Assert against captured requests
 
-```
+```csharp
  fakeServer.CapturedRequests.Count(x => x.Method == Http.Delete && x.Url == "/some-url").Should().Be(1);
 ```
+
+Return content from razor template file
+
+```csharp
+var path = "template.razor"
+fakeServer.Expect.Get(url).ReturnsFromTemplate(path, new { Id = 2343, UserId = 2343, UserEmail = "mick.hucknall@just-eat.com" })
+```
+
+Return content from file
+
+```csharp
+var path = "response.txt"
+fakeServer.Expect.Get(url).ReturnsFromFile(path)
+```
+
 
 ## Contributing
 
