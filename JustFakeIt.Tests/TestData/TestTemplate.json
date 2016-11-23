@@ -1,0 +1,5 @@
+﻿{
+  "id": @Model.Id,
+  "userId": @Model.UserId,
+  "userEmail":  "@Model.UserEmail"
+}

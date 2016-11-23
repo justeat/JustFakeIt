@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Owin.Hosting;
 using Owin;
+using System.Net.Http;
 
 namespace JustFakeIt
 {
@@ -11,6 +12,7 @@ namespace JustFakeIt
     {
         public Uri BaseUri { get; private set; }
         public Expect Expect { get; protected set; }
+        public HttpClient Client { get; private set; }
 
         public IReadOnlyList<HttpRequestExpectation> CapturedRequests
         {
@@ -30,7 +32,6 @@ namespace JustFakeIt
             Expect = new Expect();
             _capturedRequests = new List<HttpRequestExpectation>();
         }
-
         public void Dispose()
         {
             if (_webApp != null)
@@ -51,6 +52,8 @@ namespace JustFakeIt
         public void Start()
         {
             _webApp = WebApp.Start(BaseUri.ToString(), app => app.Use<ProxyMiddleware>(Expect, _capturedRequests));
+            Client = new HttpClient();
+            Client.BaseAddress = BaseUri;
         }
     }
 }
