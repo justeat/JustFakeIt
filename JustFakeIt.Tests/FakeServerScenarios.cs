@@ -183,7 +183,7 @@ namespace JustFakeIt.Tests
 
             using (var fakeServer = new FakeServer())
             {
-                fakeServer.Expect.Post(path, string.Empty).Returns(expectedResult);
+                fakeServer.Expect.Post(path).Returns(expectedResult);
 
                 fakeServer.Start();
 

@@ -10,7 +10,7 @@ namespace JustFakeIt
         
         public TimeSpan ResponseTime { get; set; }
         
-        public HttpExpectation Post(string url, string body, WebHeaderCollection expectedHeaders = null)
+        public HttpExpectation Post(string url, string body = null, WebHeaderCollection expectedHeaders = null)
         {
             return Method(Http.Post, url, body, expectedHeaders);
         }
