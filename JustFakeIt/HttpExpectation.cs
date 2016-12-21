@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.IO;
 using Newtonsoft.Json;
 using RazorEngine;
 using RazorEngine.Templating;
-using System.IO;
 
 namespace JustFakeIt
 {

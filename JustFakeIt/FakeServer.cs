@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using Microsoft.Owin.Hosting;
 using Owin;
-using System.Net.Http;
 
 namespace JustFakeIt
 {

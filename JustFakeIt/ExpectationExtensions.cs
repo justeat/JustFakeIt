@@ -1,6 +1,9 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace JustFakeIt
 {
@@ -53,7 +56,48 @@ namespace JustFakeIt
 
         public static bool MatchesActualBody(this HttpRequestExpectation expected, string actualBody)
         {
-            return string.IsNullOrEmpty(expected.Body) || actualBody.Equals(expected.Body);
+            return MatchBody(expected.Body, actualBody);
+        }
+
+        public static bool MatchBody(string expectedBody, string actualBody)
+        {
+            return string.IsNullOrEmpty(expectedBody) || actualBody.Equals(expectedBody) || expectedBody.JsonKeyValuesMatch(actualBody);
+        }
+
+        public static bool JsonKeyValuesMatch(this string expectedBody, string actualBody)
+        {
+            JObject expectedJObject;
+            JObject actualJObject;
+
+            try
+            {
+                expectedJObject = JsonConvert.DeserializeObject<JObject>(expectedBody);
+                actualJObject = JsonConvert.DeserializeObject<JObject>(actualBody);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            if (!JToken.DeepEquals(expectedJObject, actualJObject))
+            {
+                foreach (KeyValuePair<string, JToken> expectedProperty in expectedJObject)
+                {
+                    JProperty actualProperty = actualJObject.Property(expectedProperty.Key);
+
+                    if (!JToken.DeepEquals(expectedProperty.Value, actualProperty.Value))
+                    {
+                        if (MatchBody(expectedProperty.Value.ToString(), actualProperty.Value.ToString())) return true;
+
+                        Debug.WriteLine($"Value don't match for key {expectedProperty.Key}.");
+                        Debug.WriteLine($"Expected { expectedProperty.Value} but got {actualProperty.Value}");
+
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }
