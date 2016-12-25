@@ -79,22 +79,22 @@ namespace JustFakeIt
                 return false;
             }
 
-            if (!JToken.DeepEquals(expectedJObject, actualJObject))
+            if (JToken.DeepEquals(expectedJObject, actualJObject)) return true;
+            
+            foreach (KeyValuePair<string, JToken> expectedProperty in expectedJObject)
             {
-                foreach (KeyValuePair<string, JToken> expectedProperty in expectedJObject)
-                {
-                    JProperty actualProperty = actualJObject.Property(expectedProperty.Key);
+                JProperty actualProperty = actualJObject.Property(expectedProperty.Key);
 
-                    if (!JToken.DeepEquals(expectedProperty.Value, actualProperty.Value))
-                    {
-                        if (MatchBody(expectedProperty.Value.ToString(), actualProperty.Value.ToString())) return true;
+                if (actualProperty == null) return false;
 
-                        Debug.WriteLine($"Value don't match for key {expectedProperty.Key}.");
-                        Debug.WriteLine($"Expected { expectedProperty.Value} but got {actualProperty.Value}");
+                if (JToken.DeepEquals(expectedProperty.Value, actualProperty.Value)) return true;
+                
+                if (MatchBody(expectedProperty.Value.ToString(), actualProperty.Value.ToString())) return true;
 
-                        return false;
-                    }
-                }
+                Debug.WriteLine($"Value don't match for key {expectedProperty.Key}.");
+                Debug.WriteLine($"Expected { expectedProperty.Value} but got {actualProperty.Value}");
+
+                return false;
             }
 
             return true;

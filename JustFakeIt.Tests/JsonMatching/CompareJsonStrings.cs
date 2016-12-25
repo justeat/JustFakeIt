@@ -52,5 +52,25 @@ namespace JustFakeIt.Tests.JsonMatching
             var result = ExpectationExtensions.MatchBody(expected, actual);
             Assert.True(result);
         }
+
+        [Test]
+        public void NonMatchingKeys_ReturnsFalse()
+        {
+            var expected = @"{ Key: ""Value"" }";
+            var actual = @"{ NotSameKey: ""Value"" }";
+
+            var result = ExpectationExtensions.MatchBody(expected, actual);
+            Assert.False(result);
+        }
+
+        [Test]
+        public void MatchingNullValues_ReturnsTrue()
+        {
+            var expected = @"{ Key: null }";
+            var actual = @"{ Key: null }";
+
+            var result = ExpectationExtensions.MatchBody(expected, actual);
+            Assert.True(result);
+        }
     }
 }
