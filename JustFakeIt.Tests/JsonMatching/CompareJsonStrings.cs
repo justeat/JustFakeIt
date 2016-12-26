@@ -15,8 +15,8 @@ namespace JustFakeIt.Tests.JsonMatching
         }
 
         [TestCase(@"{ Key: ""Value"" }")]
-        [TestCase(@"{ Key: ""Value"", Key2: { NestedKey1: ""NestedValue1""} }")]
-        [TestCase(@"{ Key: ""Value"", Key2: { NestedKey1: ""NestedValue1"", NestedKey2: ""NestedValue2""} }")]
+        [TestCase(@"{ Key: ""Value"", Key2: { NestedKey1: ""NestedValue1""} }", TestName = "Partial Nested Json Match")]
+        [TestCase(@"{ Key: ""Value"", Key2: { NestedKey1: ""NestedValue1"", NestedKey2: ""NestedValue2""} }", TestName = "Full Nested Json Match")]
         public void NestedJson_ReturnsTrue(string expected)
         {
             var actual = 
@@ -61,6 +61,33 @@ namespace JustFakeIt.Tests.JsonMatching
 
             var result = ExpectationExtensions.MatchBody(expected, actual);
             Assert.False(result);
+        }
+
+        [Test]
+        public void NonMatchingValues_ReturnFalse()
+        {
+            var expected = @"{ Key: ""Value"" }";
+            var actual = @"{ Key: ""Not Your Value"" }";
+
+            var result = ExpectationExtensions.MatchBody(expected, actual);
+            Assert.False(result);
+        }
+
+        [TestCase(@"{ Key: ""Value"", Key2: { NestedKey1: ""Not Your Nested Value""} }", TestName = "Nested Json Value doesn't match")]
+        [TestCase(@"{ Key: ""Value"", Key2: { NotYourNestedKey: ""Value2""} }", TestName = "Nested Json Key doesn't match")]
+        public void NestedJsonThatDontMatch_ReturnsFalse(string expected)
+        {
+            var actual =
+                @"{ 
+                    Key: ""Value"", 
+                    Key2: { 
+                        NestedKey1: ""NestedValue1"", 
+                        NestedKey2: ""NestedValue2""
+                    } 
+                }";
+
+            var result = ExpectationExtensions.MatchBody(expected, actual);
+            Assert.True(result);
         }
 
         [Test]
