@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace JustFakeIt.Tests
+namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerJsonComparisonScenarios
     {

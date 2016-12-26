@@ -92,8 +92,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FakeServerJsonComparisonScenarios.cs" />
-    <Compile Include="FakeServerScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerDeleteScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerGetScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerHeaderScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerJsonComparisonScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerPostScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerPutScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerTimingScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerUsingFileContent.cs" />
     <Compile Include="JsonMatching\CompareJsonStrings.cs" />
     <Compile Include="JsonMatching\CompareStrings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
