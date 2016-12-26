@@ -75,7 +75,7 @@ namespace JustFakeIt
             return
                 requestExpectation.MatchesActualPath(context.Request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)) &&
                 requestExpectation.MatchesActualHttpMethod(context.Request.Method) &&
-                requestExpectation.MatchesActualBody(actualBody);
+                requestExpectation.MatchBodyAccordingToPattern(actualBody);
         }
 
         private string MissingRequestHeaders(IHeaderDictionary headers, WebHeaderCollection expectedRequestHeaders)
@@ -132,6 +132,7 @@ namespace JustFakeIt
                 Task.Delay(httpResponseExpectation.ResponseTime).Wait();
             else
                 Task.Delay(_expect.ResponseTime).Wait();
+
             return response.WriteAsync(expectedResults);
         }
 

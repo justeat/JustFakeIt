@@ -5,13 +5,21 @@ namespace JustFakeIt.Tests.JsonMatching
     [TestFixture]
     public class CompareStrings
     {
+        private PartialJsonMatching _jsonMatcher;
+
+        [SetUp]
+        public void Setup()
+        {
+            _jsonMatcher = new PartialJsonMatching();
+        }
+
         [Test]
         public void TwoStrings_ReturnTrue()
         {
             var expected = "string";
             var actual = "string";
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.True(result);
         }
 
@@ -21,7 +29,7 @@ namespace JustFakeIt.Tests.JsonMatching
             var expected = @"{ Key: ""Value"" }";
             var actual = @"{ Key: ""Value"" }";
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.True(result);
         }
 
@@ -31,7 +39,7 @@ namespace JustFakeIt.Tests.JsonMatching
             var expected = "";
             var actual = "";
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.True(result);
         }
 
@@ -41,7 +49,7 @@ namespace JustFakeIt.Tests.JsonMatching
             string expected = null;
             string actual = null;
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.True(result);
         }
 
@@ -51,7 +59,7 @@ namespace JustFakeIt.Tests.JsonMatching
             var expected = "string";
             var actual = "STRING";
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.False(result);
         }
 
@@ -61,7 +69,7 @@ namespace JustFakeIt.Tests.JsonMatching
             var expected = "string";
             var actual = "not same string";
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.False(result);
         }
 
@@ -71,7 +79,7 @@ namespace JustFakeIt.Tests.JsonMatching
             var expected = @"{{ Key: ""Value"" }}";
             var actual = @"{ Key: ""Value"" }";
 
-            var result = ExpectationExtensions.MatchBody(expected, actual);
+            var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.False(result);
         }
     }

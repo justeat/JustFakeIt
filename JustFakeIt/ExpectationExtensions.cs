@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace JustFakeIt
 {
@@ -54,50 +50,9 @@ namespace JustFakeIt
             return actualHttpMethod.Equals(expected.Method.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool MatchesActualBody(this HttpRequestExpectation expected, string actualBody)
+        public static bool MatchBodyAccordingToPattern(this HttpRequestExpectation expected, string actualBody)
         {
-            return MatchBody(expected.Body, actualBody);
-        }
-
-        public static bool MatchBody(string expectedBody, string actualBody)
-        {
-            return string.IsNullOrEmpty(expectedBody) || actualBody.Equals(expectedBody) || expectedBody.JsonKeyValuesMatch(actualBody);
-        }
-
-        public static bool JsonKeyValuesMatch(this string expectedBody, string actualBody)
-        {
-            JObject expectedJObject;
-            JObject actualJObject;
-
-            try
-            {
-                expectedJObject = JsonConvert.DeserializeObject<JObject>(expectedBody);
-                actualJObject = JsonConvert.DeserializeObject<JObject>(actualBody);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            if (JToken.DeepEquals(expectedJObject, actualJObject)) return true;
-            
-            foreach (KeyValuePair<string, JToken> expectedProperty in expectedJObject)
-            {
-                JProperty actualProperty = actualJObject.Property(expectedProperty.Key);
-
-                if (actualProperty == null) return false;
-
-                if (JToken.DeepEquals(expectedProperty.Value, actualProperty.Value)) return true;
-                
-                if (MatchBody(expectedProperty.Value.ToString(), actualProperty.Value.ToString())) return true;
-
-                Debug.WriteLine($"Value don't match for key {expectedProperty.Key}.");
-                Debug.WriteLine($"Expected { expectedProperty.Value} but got {actualProperty.Value}");
-
-                return false;
-            }
-
-            return true;
+            return expected.BodyMatching.MatchBody(expected.Body, actualBody);
         }
     }
 }
