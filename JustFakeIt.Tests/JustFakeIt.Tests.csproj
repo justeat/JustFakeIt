@@ -61,6 +61,10 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -88,7 +92,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FakeServerScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerDeleteScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerGetScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerHeaderScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerJsonComparisonScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerNullBodyValues.cs" />
+    <Compile Include="AcceptanceTests\FakeServerPostScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerPutScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerTimingScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerUsingFileContent.cs" />
+    <Compile Include="JsonMatching\CompareJsonStrings.cs" />
+    <Compile Include="JsonMatching\CompareStrings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

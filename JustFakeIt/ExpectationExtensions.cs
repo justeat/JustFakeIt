@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace JustFakeIt
@@ -51,9 +50,9 @@ namespace JustFakeIt
             return actualHttpMethod.Equals(expected.Method.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool MatchesActualBody(this HttpRequestExpectation expected, string actualBody)
+        public static bool MatchBodyAccordingToPattern(this HttpRequestExpectation expected, string actualBody)
         {
-            return string.IsNullOrEmpty(expected.Body) || actualBody.Equals(expected.Body);
+            return expected.BodyMatching.MatchBody(expected.Body, actualBody);
         }
     }
 }

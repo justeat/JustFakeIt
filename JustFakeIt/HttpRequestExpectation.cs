@@ -5,6 +5,8 @@ namespace JustFakeIt
 {
     public class HttpRequestExpectation
     {
+        public IBodyMatchingOption BodyMatching { get; set; }
+
         public Http Method { get; private set; }
         public string Url { get; private set; }
         public string Body { get; private set; }
@@ -15,6 +17,8 @@ namespace JustFakeIt
             Method = method;
             Url = url;
             Body = body;
+            BodyMatching = new AbsoluteBodyMatching();
+
             Headers = new WebHeaderCollection();
             if (headers != null)
             {

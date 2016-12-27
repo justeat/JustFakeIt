@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.IO;
 using Newtonsoft.Json;
 using RazorEngine;
 using RazorEngine.Templating;
-using System.IO;
 
 namespace JustFakeIt
 {
@@ -52,7 +52,7 @@ namespace JustFakeIt
             return this;
         }
 
-        
+
         public HttpExpectation Returns(HttpStatusCode expectedStatusCode, object expectedResult, WebHeaderCollection expectedHeaders = null)
         {
             Returns(expectedStatusCode, JsonConvert.SerializeObject(expectedResult), expectedHeaders);
@@ -80,6 +80,18 @@ namespace JustFakeIt
         public HttpExpectation RespondsIn(TimeSpan time)
         {
             Response.ResponseTime = time;
+            return this;
+        }
+
+        public HttpExpectation WithPartialJsonMatching()
+        {
+            Request.BodyMatching = new PartialJsonMatching();
+            return this;
+        }
+
+        public HttpExpectation UseActualBodyMatching()
+        {
+            Request.BodyMatching = new AbsoluteBodyMatching();
             return this;
         }
     }
