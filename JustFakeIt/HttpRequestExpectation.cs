@@ -5,7 +5,7 @@ namespace JustFakeIt
 {
     public class HttpRequestExpectation
     {
-        public IBodyMatchingOption BodyMatching;
+        public IBodyMatchingOption BodyMatching { get; set; }
 
         public Http Method { get; private set; }
         public string Url { get; private set; }

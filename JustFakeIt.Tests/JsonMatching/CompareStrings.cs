@@ -82,5 +82,25 @@ namespace JustFakeIt.Tests.JsonMatching
             var result = _jsonMatcher.MatchBody(expected, actual);
             Assert.False(result);
         }
+
+        [Test]
+        public void NullActual_ReturnsFalse()
+        {
+            string expected = "some string";
+            string actual = null;
+
+            var result = _jsonMatcher.MatchBody(expected, actual);
+            Assert.False(result);
+        }
+
+        [Test]
+        public void NullExpected_ReturnsTrue()
+        {
+            string actual = "some string";
+            string expected = null;
+
+            var result = _jsonMatcher.MatchBody(expected, actual);
+            Assert.True(result);
+        }
     }
 }

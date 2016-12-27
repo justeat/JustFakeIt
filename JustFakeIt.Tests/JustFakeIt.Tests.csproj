@@ -96,6 +96,7 @@
     <Compile Include="AcceptanceTests\FakeServerGetScenarios.cs" />
     <Compile Include="AcceptanceTests\FakeServerHeaderScenarios.cs" />
     <Compile Include="AcceptanceTests\FakeServerJsonComparisonScenarios.cs" />
+    <Compile Include="AcceptanceTests\FakeServerNullBodyValues.cs" />
     <Compile Include="AcceptanceTests\FakeServerPostScenarios.cs" />
     <Compile Include="AcceptanceTests\FakeServerPutScenarios.cs" />
     <Compile Include="AcceptanceTests\FakeServerScenarios.cs" />

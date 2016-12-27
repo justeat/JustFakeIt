@@ -8,9 +8,11 @@ namespace JustFakeIt
 {
     public class PartialJsonMatching : IBodyMatchingOption
     {
+        private IBodyMatchingOption absoluteMatching = new AbsoluteBodyMatching();
+
         public bool MatchBody(string expectedBody, string actualBody)
         {
-            return string.IsNullOrEmpty(expectedBody) || actualBody.Equals(expectedBody) || JsonKeyValuesMatch(expectedBody, actualBody);
+            return absoluteMatching.MatchBody(expectedBody,actualBody) || JsonKeyValuesMatch(expectedBody, actualBody);
         }
 
         public bool JsonKeyValuesMatch(string expectedBody, string actualBody)

@@ -2,9 +2,9 @@
 {
     public class AbsoluteBodyMatching : IBodyMatchingOption
     {
-        public bool MatchBody(string expected, string actualBody)
+        public bool MatchBody(string expectedBody, string actualBody)
         {
-            return string.IsNullOrEmpty(expected) || actualBody.Equals(expected);
+            return string.IsNullOrEmpty(expectedBody) || (!string.IsNullOrEmpty(actualBody) && actualBody.Equals(expectedBody));
         }
     }
 }
