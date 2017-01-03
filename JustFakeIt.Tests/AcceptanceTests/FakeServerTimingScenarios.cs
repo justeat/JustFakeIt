@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,21 +20,11 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 fakeServer.Expect.Get("/some-path").Returns(HttpStatusCode.OK, expectedResult);
                 fakeServer.Start();
 
+                // Do not use stopwatch:
                 var elapsedTime = await CallFakeServerWithAccurateUtcTimer(fakeServer);
 
                 elapsedTime.Should().BeGreaterOrEqualTo(expectedResponseTime);
             }
-        }
-
-        private static async Task<TimeSpan> CallFakeServerWithAccurateUtcTimer(FakeServer fakeServer)
-        {
-            var startTime = DateTime.Now.ToUniversalTime();
-
-            await fakeServer.Client.GetAsync("/some-path");
-
-            var endTime = DateTime.Now.ToUniversalTime();
-
-            return endTime - startTime;
         }
 
         [Fact]
@@ -50,10 +39,26 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 fakeServer.Expect.Get("/some-path").Returns(expectedResult).RespondsIn(TimeSpan.FromSeconds(5)).WithHttpStatus(HttpStatusCode.OK);
                 fakeServer.Start();
 
+                // Do not use stopwatch:
                 var elapsedTime = await CallFakeServerWithAccurateUtcTimer(fakeServer);
 
                 elapsedTime.Should().BeGreaterOrEqualTo(expectedResponseTime);
             }
+        }
+
+        private static async Task<TimeSpan> CallFakeServerWithAccurateUtcTimer(FakeServer fakeServer)
+        {
+            // The Stopwatch class uses the Windows "performance counter". 
+            // I have often read that on some systems it returns inaccurate data. 
+            // This appears to happen with older hardware and/or older operating system versions.
+            // Stack overflow: http://stackoverflow.com/questions/36725825/c-sharp-await-task-delay1000-only-takes-640ms-to-return
+            var startTime = DateTime.Now.ToUniversalTime();
+
+            await fakeServer.Client.GetAsync("/some-path");
+
+            var endTime = DateTime.Now.ToUniversalTime();
+
+            return endTime - startTime;
         }
     }
 }
