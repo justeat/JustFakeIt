@@ -2,13 +2,13 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerNullBodyValues
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPostWithNullReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
@@ -30,7 +30,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPostWithNullBodyAndPostWithNullBody_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
@@ -50,7 +50,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPostWithBodyAndPostWithNullBody_ResponseIsNotFound()
         {
             const string expectedResult = "Some String Data";

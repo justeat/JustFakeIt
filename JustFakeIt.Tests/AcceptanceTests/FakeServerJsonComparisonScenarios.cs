@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerJsonComparisonScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPostWithPartialExpectedJsonBody_ResponseMatchesExpected()
         {
             const string expectedResult = "Some String Data";
@@ -30,7 +30,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPostWithPartialExpectedJsonBodyWithNestedElements_ResponseMatchesExpected()
         {
             const string expectedResult = "Some String Data";

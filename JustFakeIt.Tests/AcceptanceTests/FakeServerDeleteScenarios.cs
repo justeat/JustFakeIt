@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerDeleteScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectDeleteReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";

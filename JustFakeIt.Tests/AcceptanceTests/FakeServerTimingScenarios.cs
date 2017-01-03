@@ -3,13 +3,13 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerTimingScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectAllEndpointsToHaveAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
         {
             var expectedResult = new { ResourceId = 1234 };
@@ -31,7 +31,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetToAnEndpointWithAFiveSecondResponseTime_ResponseTimeIsGreaterThanFiveSeconds()
         {
             var expectedResult = new { ResourceId = 1234 };

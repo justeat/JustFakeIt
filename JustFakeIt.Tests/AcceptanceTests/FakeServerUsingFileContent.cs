@@ -3,13 +3,13 @@ using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerUsingFileContent
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetReturnsGeneratedTemplateFromPath_ResponseMatchesTemplate()
         {
             const string path = "/some-path";
@@ -33,7 +33,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetReturnsFileContent_ResponseMatchesExpectation()
         {
             const string path = "/some-path";

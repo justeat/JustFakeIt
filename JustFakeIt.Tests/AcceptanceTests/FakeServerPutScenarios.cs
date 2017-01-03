@@ -2,13 +2,13 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerPutScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPutWithNoBodyReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
@@ -28,7 +28,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPutWithNoBodyReturns201_Returns201()
         {
             const string expectedResult = "Some String Data";
@@ -46,7 +46,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPutWithNoBodyReturns2011_Returns201()
         {
             const string expectedResult = "Some String Data";
@@ -64,7 +64,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPutWithComplexBodyReturnsComplexObject()
         {
             const string expectedResult = "{\"Complex\":{\"Property1\":1,\"Property2\":true}}";
@@ -84,7 +84,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectPutWithObjectBodyReturns201_Returns201()
         {
             var expectedResult = new { RestaurantId = 1234 };

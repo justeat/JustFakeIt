@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using System.Net;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerHeaderScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithResponseHeadersSpecifiedFluently_ResponseMatchesExpectionAndHasHeaders()
         {
             const string expectedResult = "Some String Data";
@@ -26,7 +26,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithRequestHeadersSpecified_WhenRequestHeadersProvided_ResponseMatchesExpection()
         {
             const string expectedResult = "Some String Data";
@@ -60,7 +60,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithRequestHeadersSpecified_WhenRequestHeadersNotProvided_ResponseIsBadRequest()
         {
             const string expectedResult = "X-Dummy1 header value not as expected.\r\n\tExpected: dummy1val\r\n\tProvided: other1val\r\nX-Dummy2 header was not provided.\r\n";
