@@ -21,14 +21,21 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 fakeServer.Expect.Get("/some-path").Returns(HttpStatusCode.OK, expectedResult);
                 fakeServer.Start();
 
-                var stopwatch = Stopwatch.StartNew();
+                var elapsedTime = await CallFakeServerWithAccurateUtcTimer(fakeServer);
 
-                await fakeServer.Client.GetAsync("/some-path");
-
-                stopwatch.Stop();
-
-                stopwatch.Elapsed.Should().BeGreaterOrEqualTo(expectedResponseTime);
+                elapsedTime.Should().BeGreaterOrEqualTo(expectedResponseTime);
             }
+        }
+
+        private static async Task<TimeSpan> CallFakeServerWithAccurateUtcTimer(FakeServer fakeServer)
+        {
+            var startTime = DateTime.Now.ToUniversalTime();
+
+            await fakeServer.Client.GetAsync("/some-path");
+
+            var endTime = DateTime.Now.ToUniversalTime();
+
+            return endTime - startTime;
         }
 
         [Fact]
@@ -43,13 +50,9 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 fakeServer.Expect.Get("/some-path").Returns(expectedResult).RespondsIn(TimeSpan.FromSeconds(5)).WithHttpStatus(HttpStatusCode.OK);
                 fakeServer.Start();
 
-                var stopwatch = Stopwatch.StartNew();
+                var elapsedTime = await CallFakeServerWithAccurateUtcTimer(fakeServer);
 
-                await fakeServer.Client.GetAsync("/some-path");
-
-                stopwatch.Stop();
-
-                stopwatch.Elapsed.Should().BeGreaterOrEqualTo(expectedResponseTime);
+                elapsedTime.Should().BeGreaterOrEqualTo(expectedResponseTime);
             }
         }
     }
