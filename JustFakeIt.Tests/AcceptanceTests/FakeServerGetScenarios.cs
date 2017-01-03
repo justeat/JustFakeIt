@@ -80,7 +80,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 var resp = await fakeServer.Client.GetStringAsync(path);
                 var result = JsonConvert.DeserializeObject<dynamic>(resp);
 
-                Assert.Equal(expectedResult.RestaurantId, (int)result.RestaurantId);
+                Assert.That(expectedResult.RestaurantId, Is.EqualTo((int)result.RestaurantId));
             }
         }
 
