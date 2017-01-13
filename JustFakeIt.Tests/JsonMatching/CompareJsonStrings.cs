@@ -5,6 +5,7 @@ namespace JustFakeIt.Tests.JsonMatching
     public class CompareJsonStrings
     {
         private PartialJsonMatching _jsonMatcher;
+
         [SetUp]
         public void Setup()
         {

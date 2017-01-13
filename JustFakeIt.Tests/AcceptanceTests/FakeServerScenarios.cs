@@ -4,13 +4,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests
 {
     public class FakeServerScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_IgnoredParameter_Returns200()
         {
             var expectedResult = new { ResourceId = 1234 };
@@ -29,7 +29,7 @@ namespace JustFakeIt.Tests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_IgnoredParameterInRestfulpath_Returns200()
         {
             var expectedResult = new { ResourceId = 1234 };
@@ -48,7 +48,7 @@ namespace JustFakeIt.Tests
             }            
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ShouldHandleMultipleRegistrationOnSameEndPoint_WithDifferentBodies_ReturnExpectedData()
         {
             var expectedResultA = "1234";
@@ -71,7 +71,7 @@ namespace JustFakeIt.Tests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ShouldExecuteResponseExpectationCallback_ReturnExpectedData()
         {
             const string expectedResult = "Some String Data";
@@ -90,7 +90,7 @@ namespace JustFakeIt.Tests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_CapturesAllRequests()
         {
             using (var fakeServer = new FakeServer())

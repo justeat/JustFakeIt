@@ -3,13 +3,13 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace JustFakeIt.Tests.AcceptanceTests
 {
     public class FakeServerGetScenarios
     {
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
@@ -26,7 +26,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithResponseHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
         {
             const string expectedResult = "Some String Data";
@@ -45,7 +45,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithQueryParametersReturnsString_ResponseMatchesExpectation()
         {
             const string expectedResult = "Some String Data";
@@ -64,7 +64,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetReturnsObject_ResponseMatchesExpectation()
         {
             var expectedResult = new { RestaurantId = 1234 };
@@ -80,11 +80,11 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 var resp = await fakeServer.Client.GetStringAsync(path);
                 var result = JsonConvert.DeserializeObject<dynamic>(resp);
 
-                Assert.Equal(expectedResult.RestaurantId, (int)result.RestaurantId);
+                Assert.That(expectedResult.RestaurantId, Is.EqualTo((int)result.RestaurantId));
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithMismatchingPath_Returns404()
         {
             const string expectedResult = "Some String Data";
@@ -101,7 +101,7 @@ namespace JustFakeIt.Tests.AcceptanceTests
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FakeServer_ExpectGetWithMismatchingMethod_Returns404()
         {
             const string expectedResult = "Some String Data";
