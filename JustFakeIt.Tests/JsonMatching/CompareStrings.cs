@@ -1,19 +1,17 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace JustFakeIt.Tests.JsonMatching
 {
-    [TestFixture]
     public class CompareStrings
     {
-        private PartialJsonMatching _jsonMatcher;
-
-        [SetUp]
-        public void Setup()
+        private readonly PartialJsonMatching _jsonMatcher;
+        
+        public CompareStrings()
         {
             _jsonMatcher = new PartialJsonMatching();
         }
 
-        [Test]
+        [Fact]
         public void TwoStrings_ReturnTrue()
         {
             var expected = "string";
@@ -23,7 +21,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.True(result);
         }
 
-        [Test]
+        [Fact]
         public void SimpleJson_ReturnsTrue()
         {
             var expected = @"{ Key: ""Value"" }";
@@ -33,7 +31,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.True(result);
         }
 
-        [Test]
+        [Fact]
         public void EmptyString_ReturnsTrue()
         {
             var expected = "";
@@ -43,7 +41,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.True(result);
         }
 
-        [Test]
+        [Fact]
         public void NullString_ReturnsTrue()
         {
             string expected = null;
@@ -53,7 +51,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.True(result);
         }
 
-        [Test]
+        [Fact]
         public void TwoStringsWithDifferentLetterCasing_ReturnFalse()
         {
             var expected = "string";
@@ -63,7 +61,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void TwoDifferentStrings_ReturnFalse()
         {
             var expected = "string";
@@ -73,7 +71,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void NotAValidJson_ReturnsFalse()
         {
             var expected = @"{{ Key: ""Value"" }}";
@@ -83,7 +81,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void NullActual_ReturnsFalse()
         {
             string expected = "some string";
@@ -93,7 +91,7 @@ namespace JustFakeIt.Tests.JsonMatching
             Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void NullExpected_ReturnsTrue()
         {
             string actual = "some string";
