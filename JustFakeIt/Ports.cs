@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -25,31 +26,11 @@ namespace JustFakeIt
             }
 
             var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            var allActiveTcpConnections = ipGlobalProperties.GetActiveTcpConnections();
-            var activeTcpConnections = allActiveTcpConnections.GetEnumerator();
+            var activeTcpConnections = ipGlobalProperties.GetActiveTcpConnections();
+            var activeTcpListeners = ipGlobalProperties.GetActiveTcpListeners();
 
-            while (activeTcpConnections.MoveNext())
-            {
-                var tcpConnectionInformation = (TcpConnectionInformation) activeTcpConnections.Current;
-                if (tcpConnectionInformation.LocalEndPoint.Port == port)
-                {
-                    return false;
-                }
-            }
-
-            var allActiveTcpListeners = ipGlobalProperties.GetActiveTcpListeners();
-            var activeTcpListeners = allActiveTcpListeners.GetEnumerator();
-
-            while (activeTcpListeners.MoveNext())
-            {
-                var ipEndPoint = (IPEndPoint) activeTcpListeners.Current;
-                if (ipEndPoint.Port == port)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return activeTcpConnections.All(x => x.LocalEndPoint.Port != port) &&
+                   activeTcpListeners.All(x => x.Port != port);
         }
     }
 }
