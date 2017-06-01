@@ -37,6 +37,18 @@ namespace JustFakeIt
                 }
             }
 
+            var allActiveTcpListeners = ipGlobalProperties.GetActiveTcpListeners();
+            var activeTcpListeners = allActiveTcpListeners.GetEnumerator();
+
+            while (activeTcpListeners.MoveNext())
+            {
+                var ipEndPoint = (IPEndPoint) activeTcpListeners.Current;
+                if (ipEndPoint.Port == port)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
     }
