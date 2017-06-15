@@ -30,6 +30,44 @@ namespace JustFakeIt.Tests
         }
 
         [Fact]
+        public async Task FakeServer_IgnoredParameterWithoutSlashAtTheStartOfUrlInExpectation_Returns200()
+        {
+            var expectedResult = new { ResourceId = 1234 };
+
+            const string fakepath = "some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
+            const string actualpath = "/some-resource/1234/some-resource?date=2015-02-06T09:52:10&type=1";
+
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.Get(fakepath).Returns(HttpStatusCode.Accepted, expectedResult);
+                fakeServer.Start();
+
+                var result = await fakeServer.Client.GetAsync(actualpath);
+
+                result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            }
+        }
+
+        [Fact]
+        public async Task FakeServer_IgnoredParameterWithoutSlashAtTheStartOfUrlInRequest_Returns200()
+        {
+            var expectedResult = new { ResourceId = 1234 };
+
+            const string fakepath = "/some-resource/{ignore}/some-resource?date={ignore}&type={ignore}";
+            const string actualpath = "some-resource/1234/some-resource?date=2015-02-06T09:52:10&type=1";
+
+            using (var fakeServer = new FakeServer(12354))
+            {
+                fakeServer.Expect.Get(fakepath).Returns(HttpStatusCode.Accepted, expectedResult);
+                fakeServer.Start();
+
+                var result = await fakeServer.Client.GetAsync(actualpath);
+
+                result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            }
+        }
+
+        [Fact]
         public async Task FakeServer_IgnoredParameterInRestfulpath_Returns200()
         {
             var expectedResult = new { ResourceId = 1234 };

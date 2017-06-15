@@ -27,6 +27,23 @@ namespace JustFakeIt.Tests.AcceptanceTests
         }
 
         [Fact]
+        public async Task FakeServer_ExpectGetWithoutSlashAtTheStartOfUrl_ResponseMatchesExpectation()
+        {
+            const string expectedResult = "Some String Data";
+
+            const string path = "some-path";
+
+            using (var fakeServer = new FakeServer())
+            {
+                fakeServer.Expect.Get(path).Returns(expectedResult);
+                fakeServer.Start();
+
+                var result = await fakeServer.Client.GetStringAsync(path);
+                result.Should().Be(expectedResult);
+            }
+        }
+
+        [Fact]
         public async Task FakeServer_ExpectGetWithResponseHeadersSpecified_ResponseMatchesExpectionAndHasHeaders()
         {
             const string expectedResult = "Some String Data";
