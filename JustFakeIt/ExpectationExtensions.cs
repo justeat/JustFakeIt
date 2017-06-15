@@ -9,8 +9,8 @@ namespace JustFakeIt
 
         public static bool MatchesActualPath(this HttpRequestExpectation expected, string actualPath)
         {
-            var newPath = MatchIgnoredParameters(expected, actualPath);
-            return newPath.Equals(expected.Url);
+            var newPath = MatchIgnoredParameters(expected, actualPath).TrimStart('/');
+            return newPath.Equals(expected.Url.TrimStart('/'));
         }
 
         private static string MatchIgnoredParameters(HttpRequestExpectation expected, string actualPath)

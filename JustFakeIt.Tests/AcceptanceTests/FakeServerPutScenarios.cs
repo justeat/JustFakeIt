@@ -27,6 +27,25 @@ namespace JustFakeIt.Tests.AcceptanceTests
                 result.Should().Be(expectedResult);
             }
         }
+        [Fact]
+        public async Task FakeServer_ExpectPutWithoutSlashAtTheStartOfUrl_ResponseMatchesExpectation()
+        {
+            const string expectedResult = "Some String Data";
+
+            const string path = "some-path";
+
+            using (var fakeServer = new FakeServer())
+            {
+                fakeServer.Expect.Put(path, string.Empty).Returns(expectedResult);
+
+                fakeServer.Start();
+
+                var resp = await fakeServer.Client.PutAsync(path, new StringContent(string.Empty));
+                var result = await resp.Content.ReadAsStringAsync();
+
+                result.Should().Be(expectedResult);
+            }
+        }
 
         [Fact]
         public async Task FakeServer_ExpectPutWithNoBodyReturns201_Returns201()
