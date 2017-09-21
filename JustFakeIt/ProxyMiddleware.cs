@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -64,7 +65,8 @@ namespace JustFakeIt
             {
                 var method = (Http)Enum.Parse(typeof(Http), request.Method, true);
                 var url = request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
-                _capturedRequests.Add(new HttpRequestExpectation(method, url, body));
+                var headerCollection = GetCollectionFromHeaders(request.Headers);
+                _capturedRequests.Add(new HttpRequestExpectation(method, url, body, headerCollection));
             }
 
             return body;
@@ -134,6 +136,19 @@ namespace JustFakeIt
                 Task.Delay(_expect.ResponseTime).Wait();
 
             return response.WriteAsync(expectedResults);
+        }
+
+        private NameValueCollection GetCollectionFromHeaders(IHeaderDictionary requestHeaders)
+        {
+            var returnCollection = new NameValueCollection();
+            if (requestHeaders != null)
+            {
+                foreach (var header in requestHeaders)
+                {
+                    returnCollection.Add(header.Key, string.Join(";",header.Value));
+                }
+            }
+            return returnCollection;
         }
 
     }

@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using FluentAssertions;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
@@ -89,6 +91,84 @@ namespace JustFakeIt.Tests.AcceptanceTests
 
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
                 result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
+            }
+        }
+
+        [Fact]
+        public async Task FakeServer_GivenHeadersSetInClientRequest_WhenActualRequestsReturned_ContainsHeadersSent()
+        {
+            const string expectedResult = "SomeResult";
+            const string path = "/some-path";
+
+            using (var fakeServer = new FakeServer())
+            {
+                var expectedRequestHeaders = new Dictionary<string,string>
+                {
+                    {"X-Dummy1", "other1val"},  
+                    {"X-Dummy3", "dummy3val"} 
+                };
+
+                fakeServer.Expect.Get(path).Returns(expectedResult);
+                fakeServer.Start();
+
+                var client = fakeServer.Client;
+                client.DefaultRequestHeaders.Accept.Clear();
+                foreach (var header in expectedRequestHeaders)
+                {
+                    client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                }
+                
+                var result = await client.GetAsync(path);
+                var capturedRequests = fakeServer.CapturedRequests;
+
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
+                result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
+                capturedRequests.Count.Should().Be(1);
+                foreach (var header in expectedRequestHeaders)
+                {
+                    capturedRequests[0].Headers[header.Key].Should().Be(header.Value);
+                }
+                
+
+
+            }
+        }
+
+        [Fact]
+        public async Task FakeServer_GivenHeadersSetInClientRequestWithMultipleValuesForSingleHeader_WhenActualRequestsReturned_ContainsHeadersSent()
+        {
+            const string expectedResult = "SomeResult";
+            const string path = "/some-path";
+
+            using (var fakeServer = new FakeServer())
+            {
+                var expectedRequestHeaders = new NameValueCollection
+                {
+                    {"X-Dummy1", "other1val"},
+                    {"X-Dummy1", "other2val"},
+                    {"X-Dummy3", "dummy3val"}
+                };
+
+                fakeServer.Expect.Get(path).Returns(expectedResult);
+                fakeServer.Start();
+
+                var client = fakeServer.Client;
+                client.DefaultRequestHeaders.Accept.Clear();
+                foreach (var header in expectedRequestHeaders.AllKeys)
+                {
+                    client.DefaultRequestHeaders.TryAddWithoutValidation(header, expectedRequestHeaders[header]);
+                }
+
+                var result = await client.GetAsync(path);
+                var capturedRequests = fakeServer.CapturedRequests;
+
+                result.StatusCode.Should().Be(HttpStatusCode.OK);
+                result.Content.ReadAsStringAsync().Result.Should().Be(expectedResult);
+                capturedRequests.Count.Should().Be(1);
+                foreach (var header in expectedRequestHeaders.AllKeys)
+                {
+                    capturedRequests[0].Headers[header].Should().Be(expectedRequestHeaders[header]);
+                }
             }
         }
     }
